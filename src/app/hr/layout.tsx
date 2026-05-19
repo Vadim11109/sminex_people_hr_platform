@@ -1,11 +1,10 @@
-import { auth } from '@/lib/auth'
-import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 
+// AUTH DISABLED — dev mode
+const mockSession = { user: { id: 'dev', name: 'Dev HR', email: 'hr@sminex.ru', roles: ['HR', 'MANAGER', 'EMPLOYEE'] as never } }
+
 export default async function HrLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
-  if (!session) redirect('/auth/signin')
-  if (!session.user.roles.includes('HR')) redirect('/')
+  const session = mockSession
 
   const navItems = [
     { href: '/hr', icon: '📊', label: 'Дашборд' },

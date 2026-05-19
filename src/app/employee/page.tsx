@@ -1,7 +1,5 @@
-import { auth } from '@/lib/auth'
-
 export default async function EmployeeDashboard() {
-  const session = await auth()
+  const session = { user: { name: 'Иван Петров' } }
 
   return (
     <>

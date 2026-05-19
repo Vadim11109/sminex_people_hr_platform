@@ -1,86 +1,94 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
+import { COMPETENCIES, FREQ_LABELS, getGradeInfo } from '@/lib/assessment-data'
 
-const COMPETENCIES = [
-  { name: 'Стратегическое мышление', desc: 'Умение видеть долгосрочную перспективу, выстраивать продуктовую стратегию, расставлять приоритеты с учётом бизнес-целей.' },
-  { name: 'Работа с данными', desc: 'Навыки анализа метрик, A/B тестирования, формулировки гипотез и принятия решений на основе данных.' },
-  { name: 'Управление командой', desc: 'Способность координировать работу кросс-функциональной команды, выстраивать процессы и мотивировать участников.' },
-  { name: 'Коммуникация', desc: 'Умение чётко и структурированно доносить идеи до разных аудиторий: бизнес, разработчики, стейкхолдеры.' },
-  { name: 'Технические знания', desc: 'Понимание технических ограничений и возможностей, способность участвовать в архитектурных обсуждениях.' },
-  { name: 'Управление продуктом', desc: 'Навыки работы с бэклогом, пользовательскими историями, роадмэпом и delivery-процессами.' },
-  { name: 'Клиентоориентированность', desc: 'Умение выявлять потребности пользователей, проводить исследования, строить продукт вокруг ценности для клиента.' },
-  { name: 'Agile / процессы', desc: 'Применение agile-практик (Scrum, Kanban), организация спринтов, ретроспектив и улучшение командных процессов.' },
-  { name: 'Лидерство', desc: 'Способность вести за собой, принимать ответственные решения, развивать других и формировать продуктовую культуру.' },
-]
+// ─── Types ───────────────────────────────────────────────────────────────────
+type SubRatings   = Record<string, number>          // "cid-si" → 0|1|2|3
+type FreqAnswers  = Record<string, Record<number, number>> // cid → qi → 1..5
+type Examples     = Record<string, Record<number, string>> // cid → qi → text
+type CompExamples = Record<string, string>          // cid → text
+type OpenCards    = Record<string, boolean>
 
-const SCORE_LABELS: Record<number, { short: string; long: string; color: string }> = {
-  0: { short: '0', long: 'Не проявляется', color: 'var(--hint)' },
-  1: { short: '1', long: 'Базовый', color: 'var(--amber)' },
-  2: { short: '2', long: 'Уверенный', color: 'var(--blue)' },
-  3: { short: '3', long: 'Экспертный', color: 'var(--green)' },
-}
-
-function getGradeInfo(avg: number) {
-  if (avg >= 2.8)  return { label: 'Сеньор Ранг 3', cls: 'badge-s' }
-  if (avg >= 2.6)  return { label: 'Сеньор Ранг 2', cls: 'badge-s' }
-  if (avg >= 2.4)  return { label: 'Сеньор Ранг 1', cls: 'badge-s' }
-  if (avg >= 2.13) return { label: 'Мидл Ранг 3',   cls: 'badge-m' }
-  if (avg >= 1.87) return { label: 'Мидл Ранг 2',   cls: 'badge-m' }
-  if (avg >= 1.6)  return { label: 'Мидл Ранг 1',   cls: 'badge-m' }
-  if (avg >= 1.33) return { label: 'Джуниор Ранг 3', cls: 'badge-j' }
-  if (avg >= 1.07) return { label: 'Джуниор Ранг 2', cls: 'badge-j' }
-  if (avg >= 0.8)  return { label: 'Джуниор Ранг 1', cls: 'badge-j' }
-  return { label: 'Ниже Джуниора', cls: 'badge-j' }
+// ─── Grade badge CSS ─────────────────────────────────────────────────────────
+function gradeCss(grade: string) {
+  if (grade === 'S') return { bg: 'var(--amber-bg)', border: 'var(--amber-light)', color: 'var(--amber)' }
+  if (grade === 'M') return { bg: 'var(--green-bg)',  border: 'var(--green-light)', color: 'var(--green)' }
+  if (grade === 'J') return { bg: 'var(--blue-bg)',   border: 'var(--blue-light)',  color: 'var(--blue)'  }
+  return { bg: 'var(--surface2)', border: 'var(--border)', color: 'var(--hint)' }
 }
 
 export default function EmployeeAssessmentPage() {
-  const [scores, setScores] = useState<Record<number, number>>({})
-  const [comments, setComments] = useState<Record<number, string>>({})
-  const [submitted, setSubmitted] = useState(false)
+  const [subRatings,   setSubRatings]   = useState<SubRatings>({})
+  const [freqAnswers,  setFreqAnswers]  = useState<FreqAnswers>({})
+  const [examples,     setExamples]     = useState<Examples>({})
+  const [compExamples, setCompExamples] = useState<CompExamples>({})
+  const [generalNote,  setGeneralNote]  = useState('')
+  const [openCards,    setOpenCards]    = useState<OpenCards>({})
+  const [submitted,    setSubmitted]    = useState(false)
 
-  const rated = Object.keys(scores).length
-  const allDone = rated === COMPETENCIES.length
+  // ── helpers ──
+  const toggleCard = useCallback((key: string) =>
+    setOpenCards(prev => ({ ...prev, [key]: !prev[key] })), [])
 
-  const avg = allDone
-    ? Object.values(scores).reduce((s, v) => s + v, 0) / COMPETENCIES.length
-    : 0
-  const grade = allDone ? getGradeInfo(avg) : null
+  const setSub = useCallback((cid: number, si: number, val: number) =>
+    setSubRatings(prev => ({ ...prev, [`${cid}-${si}`]: val })), [])
 
-  function setScore(idx: number, score: number) {
-    setScores(prev => ({ ...prev, [idx]: score }))
+  const setFreq = useCallback((cid: number, qi: number, val: number) =>
+    setFreqAnswers(prev => ({
+      ...prev,
+      [cid]: { ...(prev[cid] ?? {}), [qi]: val },
+    })), [])
+
+  const setExample = useCallback((cid: number, qi: number, val: string) =>
+    setExamples(prev => ({
+      ...prev,
+      [cid]: { ...(prev[cid] ?? {}), [qi]: val },
+    })), [])
+
+  // ── derived state ──
+  function getCompScore(cid: number): number | null {
+    const comp = COMPETENCIES.find(c => c.id === cid)!
+    const allRated = comp.subs.every((_, i) => subRatings[`${cid}-${i}`] !== undefined)
+    if (!allRated) return null
+    return comp.subs.reduce((sum, _, i) => sum + subRatings[`${cid}-${i}`], 0) / comp.subs.length
   }
 
-  function handleSubmit() {
-    setSubmitted(true)
+  function isCompDone(cid: number): boolean {
+    return getCompScore(cid) !== null
   }
 
+  const doneCount = COMPETENCIES.filter(c => isCompDone(c.id)).length
+  const allDone   = doneCount === 9
+
+  const overallAvg = allDone
+    ? COMPETENCIES.reduce((sum, c) => sum + (getCompScore(c.id) ?? 0), 0) / 9
+    : null
+
+  // ── thank you screen ──
   if (submitted) {
     return (
       <>
         <div className="topbar">
           <h1 style={{ fontSize: '15px', fontWeight: 600 }}>Q1 2025 — PO Assessment</h1>
         </div>
-        <div className="page-body" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '60vh' }}>
-          <div style={{ textAlign: 'center', maxWidth: '480px' }}>
-            <div style={{ fontSize: '56px', marginBottom: '1.5rem' }}>🎉</div>
-            <h2 style={{ fontSize: '22px', fontWeight: 600, marginBottom: '.75rem', fontFamily: 'var(--font-playfair), Georgia, serif' }}>
-              Само-оценка завершена!
-            </h2>
-            <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '1.5rem' }}>
-              Ваши ответы сохранены. Результаты будут доступны только вашему руководителю и HR.
-              После завершения цикла вы вместе разберёте результаты на 1:1.
-            </p>
+        <div className="page-body" style={{ display: 'flex', justifyContent: 'center', paddingTop: '4rem' }}>
+          <div style={{ textAlign: 'center', maxWidth: '520px' }}>
             <div style={{
-              background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
-              padding: '1rem 1.5rem', marginBottom: '1.5rem', display: 'inline-block',
-            }}>
-              <div style={{ fontSize: '12px', color: 'var(--hint)', marginBottom: '.25rem' }}>Предварительный результат</div>
-              <div style={{ fontSize: '11px', color: 'var(--hint)' }}>Виден только вам до завершения цикла</div>
-            </div>
-            <div>
-              <a href="/employee" className="btn btn-primary">← Вернуться к ассесментам</a>
-            </div>
+              width: 72, height: 72, borderRadius: '50%',
+              background: 'var(--green-bg)', border: '2px solid var(--green-light)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              margin: '0 auto 1.75rem', fontSize: 30, color: 'var(--green)',
+            }}>✓</div>
+            <h2 style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '26px', fontWeight: 600, marginBottom: '.75rem' }}>
+              Спасибо за честность!
+            </h2>
+            <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '2rem' }}>
+              Само-оценка завершена. Ваши ответы переданы руководителю и HR — они используют их
+              для развивающего диалога, а не для пересмотра грейда. Вы молодец, что нашли время
+              осмыслить свою работу.
+            </p>
+            <a href="/employee" className="btn btn-primary">← К ассесментам</a>
           </div>
         </div>
       </>
@@ -89,124 +97,300 @@ export default function EmployeeAssessmentPage() {
 
   return (
     <>
+      {/* Topbar */}
       <div className="topbar">
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
-          <a href="/employee" style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '13px' }}>← Ассесменты</a>
+          <a href="/employee" style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '13px' }}>← Назад</a>
           <span style={{ color: 'var(--border)' }}>/</span>
           <h1 style={{ fontSize: '15px', fontWeight: 600 }}>Q1 2025 — PO Assessment</h1>
+          <span className="role-pill role-pill-employee">Само-оценка</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
           <div className="prog-track" style={{ width: '140px' }}>
-            <div className="prog-fill prog-fill-purple" style={{ width: `${(rated / COMPETENCIES.length) * 100}%` }} />
+            <div className="prog-fill prog-fill-purple" style={{ width: `${(doneCount / 9) * 100}%` }} />
           </div>
-          <span style={{ fontSize: '12px', color: 'var(--muted)' }}>{rated} / {COMPETENCIES.length}</span>
+          <span style={{ fontSize: '12px', color: 'var(--muted)', minWidth: '40px' }}>{doneCount} / 9</span>
         </div>
       </div>
 
       <div className="page-body">
+        {/* Intro */}
         <div style={{
-          background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 'var(--radius)',
-          padding: '.875rem 1.25rem', marginBottom: '1.5rem', fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6,
+          background: 'var(--purple-bg, #F5EEFA)', border: '1px solid var(--purple-light, #CDB8E0)',
+          borderRadius: 'var(--radius)', padding: '1.25rem 1.75rem', marginBottom: '1.75rem',
+          display: 'flex', gap: '1rem', alignItems: 'flex-start',
         }}>
-          Оцените себя по каждой компетенции: насколько уверенно вы владеете навыком прямо сейчас, в вашей текущей работе.
-          Будьте честны — это поможет выявить зоны роста и составить план развития вместе с руководителем.
+          <span style={{ fontSize: '22px', flexShrink: 0, marginTop: 2 }}>💡</span>
+          <p style={{ fontSize: '13px', color: '#3B0764', lineHeight: 1.65 }}>
+            <strong>Как работает само-оценка.</strong> Для каждой компетенции оцените себя по каждому аспекту —
+            кликните на описание уровня, которое лучше всего отражает вашу текущую практику.
+            Если навык не проявляется — нажмите «✕ Не показываю». Добавьте конкретный кейс из практики.
+            <br />
+            <strong>Будьте честны:</strong> само-оценка сравнивается с оценкой руководителя — расхождения
+            в обе стороны становятся темой для разговора, а не основанием для пересмотра грейда.
+          </p>
         </div>
 
-        {COMPETENCIES.map(({ name, desc }, idx) => {
-          const selected = scores[idx]
-          const hasScore = selected !== undefined
+        {/* Competency cards */}
+        {COMPETENCIES.map((comp) => {
+          const score = getCompScore(comp.id)
+          const done  = score !== null
+          const open  = !!openCards[`c-${comp.id}`]
+          const gi    = done ? getGradeInfo(score!) : null
+          const css   = gi ? gradeCss(gi.grade) : null
+
           return (
             <div
-              key={name}
-              className="card"
+              key={comp.id}
               style={{
-                marginBottom: '.75rem',
-                borderLeft: hasScore ? '3px solid var(--purple)' : undefined,
+                background: 'var(--surface)',
+                border: `1px solid var(--border)`,
+                borderLeft: `3px solid ${done ? 'var(--purple-light, #CDB8E0)' : 'transparent'}`,
+                borderRadius: 'var(--radius)',
+                marginBottom: '1rem',
+                overflow: 'hidden',
               }}
             >
-              <div className="card-body">
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '.875rem' }}>
-                  <div>
-                    <div style={{ fontSize: '11px', color: 'var(--hint)', marginBottom: '.25rem' }}>
-                      Компетенция {idx + 1} из {COMPETENCIES.length}
-                    </div>
-                    <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '.375rem' }}>{name}</div>
-                    <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>{desc}</div>
+              {/* Card header */}
+              <div
+                onClick={() => toggleCard(`c-${comp.id}`)}
+                style={{
+                  padding: '1.125rem 1.75rem', display: 'flex', alignItems: 'center',
+                  gap: '1rem', cursor: 'pointer', userSelect: 'none',
+                  background: open ? 'var(--surface2)' : undefined,
+                  transition: 'background .15s',
+                }}
+              >
+                <div style={{
+                  width: 26, height: 26, borderRadius: 3, flexShrink: 0,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 11, fontWeight: 700,
+                  background: 'var(--purple-bg, #F5EEFA)',
+                  border: '1px solid var(--purple-light, #CDB8E0)',
+                  color: 'var(--purple)',
+                }}>
+                  {comp.id}
+                </div>
+                <div style={{ flex: 1 }}>
+                  <div style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '.15em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: 2 }}>
+                    {comp.code}
                   </div>
-                  {hasScore ? (
-                    <span className="status status-done">Оценено: {selected}</span>
-                  ) : (
-                    <span className="status status-pending">Не оценено</span>
-                  )}
+                  <div style={{ fontSize: '14px', fontWeight: 600, color: 'var(--text)' }}>{comp.name}</div>
+                  <div style={{ fontSize: '12px', color: 'var(--muted)', marginTop: 2 }}>{comp.sub}</div>
                 </div>
-
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '.5rem' }}>
-                  {[0, 1, 2, 3].map(score => {
-                    const info = SCORE_LABELS[score]
-                    const isSelected = selected === score
-                    return (
-                      <button
-                        key={score}
-                        onClick={() => setScore(idx, score)}
-                        className="btn btn-sm"
-                        style={{
-                          padding: '.625rem .5rem',
-                          textAlign: 'center',
-                          display: 'flex',
-                          flexDirection: 'column',
-                          alignItems: 'center',
-                          gap: '.25rem',
-                          height: 'auto',
-                          background: isSelected ? 'var(--surface3, rgba(139,92,246,.12))' : undefined,
-                          border: isSelected ? `1px solid var(--purple)` : undefined,
-                        }}
-                      >
-                        <span style={{ fontSize: '20px', fontWeight: 700, color: info.color }}>{info.short}</span>
-                        <span style={{ fontSize: '11px', color: isSelected ? 'var(--text)' : 'var(--muted)', lineHeight: 1.3 }}>
-                          {info.long}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-
-                {hasScore && (
-                  <textarea
-                    value={comments[idx] ?? ''}
-                    onChange={e => setComments(prev => ({ ...prev, [idx]: e.target.value }))}
-                    placeholder="Добавьте комментарий (необязательно)..."
-                    style={{
-                      marginTop: '.75rem',
-                      width: '100%',
-                      padding: '.625rem .75rem',
-                      fontSize: '13px',
-                      border: '1px solid var(--border)',
-                      borderRadius: '3px',
-                      background: 'var(--surface2)',
-                      color: 'var(--text)',
-                      resize: 'vertical',
-                      minHeight: '56px',
-                      outline: 'none',
-                      boxSizing: 'border-box',
-                    }}
-                  />
+                {gi && css ? (
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', padding: '3px 10px',
+                    borderRadius: 2, fontSize: 11, fontWeight: 600, border: '1px solid',
+                    background: css.bg, borderColor: css.border, color: css.color,
+                    letterSpacing: '.3px',
+                  }}>
+                    {gi.label} ({score!.toFixed(1)})
+                  </span>
+                ) : (
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', padding: '3px 10px',
+                    borderRadius: 2, fontSize: 11, fontWeight: 600,
+                    background: 'var(--purple-bg, #F5EEFA)', border: '1px solid var(--purple-light, #CDB8E0)',
+                    color: 'var(--purple)', letterSpacing: '.3px',
+                  }}>
+                    не заполнено
+                  </span>
                 )}
+                <span style={{ color: 'var(--hint)', fontSize: 16, transition: 'transform .18s', transform: open ? 'rotate(90deg)' : undefined }}>›</span>
               </div>
+
+              {/* Card body */}
+              {open && (
+                <div style={{ borderTop: '1px solid var(--border)', padding: '1.5rem 1.75rem' }}>
+                  {/* Sub-criteria */}
+                  <div style={{
+                    background: 'var(--surface)', border: '1px solid var(--border)',
+                    borderRadius: 'var(--radius)', padding: '1.5rem', marginBottom: '1.25rem',
+                  }}>
+                    <div style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: '1.25rem' }}>
+                      Оцените себя по каждому аспекту
+                    </div>
+
+                    {comp.subs.map((sub, si) => {
+                      const key = `${comp.id}-${si}`
+                      const val = subRatings[key]
+                      return (
+                        <div key={si} style={{ paddingBottom: '1.375rem', marginBottom: si < comp.subs.length - 1 ? '1.375rem' : 0, borderBottom: si < comp.subs.length - 1 ? '1px solid var(--border)' : undefined }}>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
+                            <span style={{ fontSize: '13px', fontWeight: 600, color: 'var(--text)', flex: 1, minWidth: 160 }}>
+                              {si + 1}. {sub.name}
+                            </span>
+                            <button
+                              onClick={() => setSub(comp.id, si, 0)}
+                              style={{
+                                padding: '5px 13px', borderRadius: 3, fontSize: 12, fontWeight: 500,
+                                cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
+                                background: val === 0 ? 'var(--red-bg, #FEF2F2)' : 'var(--surface2)',
+                                border: `1.5px solid ${val === 0 ? 'var(--red, #991B1B)' : 'var(--border)'}`,
+                                color: val === 0 ? 'var(--red, #991B1B)' : 'var(--muted)',
+                              }}
+                            >
+                              ✕ Не показываю
+                            </button>
+                          </div>
+                          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '.75rem' }}>
+                            {([1, 2, 3] as const).map((level) => {
+                              const text = level === 1 ? sub.j_self : level === 2 ? sub.m_self : sub.s_self
+                              const selCls = level === 1 ? 'sel-j' : level === 2 ? 'sel-m' : 'sel-s'
+                              const headBg  = level === 1 ? 'var(--blue-bg)'  : level === 2 ? 'var(--green-bg)'  : 'var(--amber-bg)'
+                              const headClr = level === 1 ? 'var(--blue)'     : level === 2 ? 'var(--green)'     : 'var(--amber)'
+                              const selBg   = level === 1 ? 'var(--blue-bg)'  : level === 2 ? 'var(--green-bg)'  : 'var(--amber-bg)'
+                              const selBdr  = level === 1 ? 'var(--blue)'     : level === 2 ? 'var(--green)'     : 'var(--amber)'
+                              const selShadow = level === 1 ? 'rgba(42,84,128,.12)' : level === 2 ? 'rgba(46,107,72,.12)' : 'rgba(138,104,0,.12)'
+                              const isSelected = val === level
+                              return (
+                                <div
+                                  key={level}
+                                  onClick={() => setSub(comp.id, si, level)}
+                                  style={{
+                                    borderRadius: 3, cursor: 'pointer', transition: 'all .18s',
+                                    border: `1.5px solid ${isSelected ? selBdr : 'var(--border)'}`,
+                                    background: isSelected ? selBg : 'var(--surface2)',
+                                    boxShadow: isSelected ? `0 4px 16px ${selShadow}` : undefined,
+                                    transform: isSelected ? 'translateY(-1px)' : undefined,
+                                    overflow: 'hidden',
+                                  }}
+                                >
+                                  <div style={{ padding: '7px 14px', fontSize: '10px', fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', background: headBg, color: headClr }}>
+                                    {level === 1 ? 'Junior' : level === 2 ? 'Middle' : 'Senior'}
+                                  </div>
+                                  <div style={{ padding: '10px 14px', fontSize: '12px', color: isSelected ? 'var(--text)' : 'var(--muted)', lineHeight: 1.55 }}>
+                                    {text}
+                                  </div>
+                                </div>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })}
+
+                    {/* Competency example */}
+                    <div style={{ marginTop: '1rem' }}>
+                      <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--hint)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                        Кейс или конкретный пример из практики
+                      </label>
+                      <textarea
+                        value={compExamples[comp.id] ?? ''}
+                        onChange={e => setCompExamples(prev => ({ ...prev, [comp.id]: e.target.value }))}
+                        placeholder="Ситуация, которая лучше всего отражает ваш уровень по этой компетенции..."
+                        style={{
+                          width: '100%', padding: '8px 14px', border: '1px solid var(--border)',
+                          borderRadius: 3, fontSize: 12, color: 'var(--text)', background: 'var(--surface2)',
+                          outline: 'none', fontFamily: 'inherit', resize: 'vertical', minHeight: 56, lineHeight: 1.55,
+                          boxSizing: 'border-box',
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Self questions (frequency scale) */}
+                  <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem', marginTop: '1.25rem' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: '1.25rem' }}>
+                      Кейс-секция
+                    </div>
+
+                    {comp.self_qs.map((q, qi) => {
+                      const selected = freqAnswers[comp.id]?.[qi]
+                      return (
+                        <div key={qi} style={{ marginBottom: '1.5rem', paddingBottom: '1.5rem', borderBottom: qi < comp.self_qs.length - 1 ? '1px solid var(--border)' : undefined }}>
+                          <div style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: '.5rem', lineHeight: 1.55 }}>
+                            {qi + 1}. {q.q}
+                          </div>
+                          <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: '.75rem', fontStyle: 'italic' }}>
+                            {q.hint}
+                          </div>
+                          <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap' }}>
+                            {FREQ_LABELS.map((label, fi) => {
+                              const val = fi + 1
+                              const isSel = selected === val
+                              const selColors = [
+                                { bg: '#FEF2F2', border: '#FECACA', color: '#991B1B' },
+                                { bg: '#FFF7ED', border: '#FED7AA', color: '#9A3412' },
+                                { bg: 'var(--amber-bg)', border: 'var(--amber-light)', color: 'var(--amber)' },
+                                { bg: 'var(--blue-bg)',  border: 'var(--blue-light)',  color: 'var(--blue)'  },
+                                { bg: 'var(--green-bg)', border: 'var(--green-light)', color: 'var(--green)' },
+                              ]
+                              const sc = selColors[fi]
+                              return (
+                                <button
+                                  key={val}
+                                  onClick={() => setFreq(comp.id, qi, val)}
+                                  style={{
+                                    padding: '5px 13px', borderRadius: 3, fontSize: 12, fontWeight: isSel ? 600 : 500,
+                                    cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
+                                    background: isSel ? sc.bg : 'var(--surface2)',
+                                    border: `1.5px solid ${isSel ? sc.border : 'var(--border)'}`,
+                                    color: isSel ? sc.color : 'var(--muted)',
+                                  }}
+                                >
+                                  {val} — {label}
+                                </button>
+                              )
+                            })}
+                          </div>
+                          {selected !== undefined && (
+                            <div style={{ marginTop: '.75rem' }}>
+                              <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--hint)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
+                                Конкретный пример из практики
+                              </label>
+                              <textarea
+                                value={examples[comp.id]?.[qi] ?? ''}
+                                onChange={e => setExample(comp.id, qi, e.target.value)}
+                                placeholder="Ситуация, когда это проявилось..."
+                                style={{
+                                  width: '100%', padding: '8px 14px', border: '1px solid var(--border)',
+                                  borderRadius: 3, fontSize: 12, color: 'var(--text)', background: 'var(--surface2)',
+                                  outline: 'none', fontFamily: 'inherit', resize: 'vertical', minHeight: 52, lineHeight: 1.55,
+                                  boxSizing: 'border-box',
+                                }}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
             </div>
           )
         })}
 
-        {/* Submit */}
-        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '.75rem', marginTop: '1rem', paddingBottom: '2rem' }}>
-          <a href="/employee" className="btn btn-sm">Сохранить и выйти</a>
+        {/* General note */}
+        <div style={{ marginTop: '1.75rem', paddingTop: '1.75rem', borderTop: '1px solid var(--border)' }}>
+          <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: 7 }}>
+            Что хочу развивать — мои приоритеты роста
+          </label>
+          <textarea
+            value={generalNote}
+            onChange={e => setGeneralNote(e.target.value)}
+            placeholder="Что даётся труднее всего? Какие навыки хочу прокачать? Какую поддержку жду от руководителя?"
+            style={{
+              width: '100%', padding: '10px 14px', border: '1px solid var(--border)', borderRadius: 3,
+              fontSize: 13, color: 'var(--text)', background: 'var(--surface2)', outline: 'none',
+              fontFamily: 'inherit', resize: 'vertical', minHeight: 76, lineHeight: 1.65, boxSizing: 'border-box',
+            }}
+          />
+        </div>
+
+        {/* Actions */}
+        <div style={{ display: 'flex', gap: '.75rem', marginTop: '1.75rem', paddingBottom: '3rem', flexWrap: 'wrap' }}>
           <button
             className="btn btn-primary"
-            onClick={handleSubmit}
+            onClick={() => setSubmitted(true)}
             disabled={!allDone}
-            style={{ opacity: allDone ? 1 : .5 }}
+            style={{ opacity: allDone ? 1 : .45, background: 'var(--purple)', borderColor: 'var(--purple)' }}
           >
-            Завершить само-оценку ({rated} / {COMPETENCIES.length})
+            Завершить само-оценку ({doneCount} / 9)
           </button>
+          <a href="/employee" className="btn">Сохранить и выйти</a>
         </div>
       </div>
     </>

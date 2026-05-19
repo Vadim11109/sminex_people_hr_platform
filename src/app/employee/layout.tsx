@@ -1,11 +1,10 @@
-import { auth } from '@/lib/auth'
-import { redirect } from 'next/navigation'
 import { Sidebar } from '@/components/layout/Sidebar'
 
+// AUTH DISABLED — dev mode
+const mockSession = { user: { id: 'dev', name: 'Dev Employee', email: 'employee@sminex.ru', roles: ['EMPLOYEE'] as never } }
+
 export default async function EmployeeLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth()
-  if (!session) redirect('/auth/signin')
-  if (!session.user.roles.includes('EMPLOYEE')) redirect('/')
+  const session = mockSession
 
   const navItems = [
     { href: '/employee', icon: '📋', label: 'Мои ассесменты', badge: 1 },

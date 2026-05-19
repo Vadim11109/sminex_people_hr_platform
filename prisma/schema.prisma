@@ -1,0 +1,189 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── ENUMS ───────────────────────────────────────────────────
+
+enum UserRole {
+  EMPLOYEE
+  MANAGER
+  HR
+}
+
+enum CycleStatus {
+  DRAFT
+  ACTIVE
+  CLOSED
+}
+
+enum AssessmentStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+
+// ─── MODELS ──────────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  image     String?
+  azureId   String?  @unique
+
+  // Assigned roles — set by HR, never self-selected
+  roles     UserRole[] @default([EMPLOYEE])
+
+  // Manager relationship
+  managerId String?
+  manager   User?    @relation("Reports", fields: [managerId], references: [id])
+  reports   User[]   @relation("Reports")
+
+  // Team / position
+  team      String?
+  position  String?
+
+  // Relations
+  selfAssessments    SelfAssessment[]
+  managerAssessments ManagerAssessment[] @relation("AssessorOf")
+  subjectOf          ManagerAssessment[] @relation("SubjectOf")
+  cyclesCreated      AssessmentCycle[]
+
+  // NextAuth
+  accounts  Account[]
+  sessions  Session[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ─── NEXTAUTH REQUIRED MODELS ────────────────────────────────
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ─── ASSESSMENT MODELS ───────────────────────────────────────
+
+model AssessmentTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  version     String   @default("1.0")
+  isActive    Boolean  @default(true)
+  content     Json     // Full competency JSON
+
+  cycles AssessmentCycle[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AssessmentCycle {
+  id          String      @id @default(cuid())
+  name        String
+  status      CycleStatus @default(DRAFT)
+  startsAt    DateTime
+  endsAt      DateTime?
+
+  templateId  String
+  template    AssessmentTemplate @relation(fields: [templateId], references: [id])
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  assignments Assignment[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Assignment {
+  id         String          @id @default(cuid())
+  cycleId    String
+  cycle      AssessmentCycle @relation(fields: [cycleId], references: [id])
+  employeeId String
+  managerId  String
+
+  selfAssessment SelfAssessment?
+  mgrAssessment  ManagerAssessment?
+
+  createdAt DateTime @default(now())
+
+  @@unique([cycleId, employeeId])
+}
+
+model SelfAssessment {
+  id           String           @id @default(cuid())
+  assignmentId String           @unique
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id])
+  userId       String
+  user         User             @relation(fields: [userId], references: [id])
+
+  subRatings   Json             @default("{}")
+  answers      Json             @default("{}")
+  examples     Json             @default("{}")
+  compExamples Json             @default("{}")
+  generalNote  String?
+
+  status       AssessmentStatus @default(NOT_STARTED)
+  completedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ManagerAssessment {
+  id           String           @id @default(cuid())
+  assignmentId String           @unique
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id])
+  assessorId   String
+  assessor     User             @relation("AssessorOf", fields: [assessorId], references: [id])
+  subjectId    String
+  subject      User             @relation("SubjectOf", fields: [subjectId], references: [id])
+
+  subRatings   Json             @default("{}")
+  comments     Json             @default("{}")
+  generalNote  String?
+  devPlan      String?
+
+  status       AssessmentStatus @default(NOT_STARTED)
+  completedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

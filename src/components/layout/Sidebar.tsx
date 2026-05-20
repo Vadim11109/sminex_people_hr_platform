@@ -7,7 +7,6 @@ import type { UserRole } from '@prisma/client'
 
 interface NavItem {
   href: string
-  icon: string
   label: string
   badge?: number
 }
@@ -47,9 +46,31 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
 
   return (
     <aside className="sidebar">
-      <div className="sidebar-logo">
-        <div className="sidebar-logo-name">Sminex People</div>
-        <div className="sidebar-logo-sub">HR Platform</div>
+      <div className="sidebar-logo" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.625rem' }}>
+          <span style={{
+            fontFamily: 'var(--font-playfair), Georgia, serif',
+            fontSize: '15px', fontWeight: 700,
+            letterSpacing: '.08em', color: 'var(--text)',
+            lineHeight: 1,
+          }}>
+            SMINEX
+          </span>
+          <span style={{ width: 1, height: 13, background: 'var(--border2)', flexShrink: 0, display: 'block' }} />
+          <span style={{
+            fontSize: '11px', fontWeight: 500,
+            letterSpacing: '.16em', color: 'var(--muted)',
+            textTransform: 'uppercase', lineHeight: 1,
+          }}>
+            People
+          </span>
+        </div>
+        <div style={{
+          fontSize: '9px', letterSpacing: '.18em', color: 'var(--hint)',
+          textTransform: 'uppercase', marginTop: '5px', fontWeight: 400,
+        }}>
+          HR Platform
+        </div>
       </div>
 
       <nav className="nav-section" style={{ flex: 1 }}>
@@ -59,7 +80,6 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
             href={item.href}
             className={`nav-item ${pathname === item.href || pathname.startsWith(item.href + '/') ? 'active' : ''}`}
           >
-            <span className="nav-icon">{item.icon}</span>
             <span style={{ flex: 1 }}>{item.label}</span>
             {item.badge ? (
               <span style={{ background: 'var(--blue)', color: '#fff', fontSize: '10px', fontWeight: 700, padding: '1px 6px', borderRadius: '2px' }}>
@@ -95,7 +115,10 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
               cursor: 'pointer', textDecoration: 'none', transition: 'all .15s',
             }}
           >
-            <span>⇆</span> Сменить режим
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M1 4h8M7 2l2 2-2 2M11 8H3M5 6l-2 2 2 2" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Сменить режим
           </Link>
         )}
 
@@ -108,7 +131,10 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
             cursor: 'pointer', width: '100%',
           }}
         >
-          <span>→</span> Выйти
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+              <path d="M5 2H2.5A.5.5 0 002 2.5v7a.5.5 0 00.5.5H5M8 8.5L10.5 6 8 3.5M4.5 6h6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Выйти
         </button>
       </div>
     </aside>

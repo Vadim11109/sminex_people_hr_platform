@@ -6,7 +6,6 @@ export default function AuthErrorPage({
   return (
     <div style={{ minHeight: '100vh', background: 'var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 'var(--radius)', padding: '2.5rem', width: '400px', textAlign: 'center' }}>
-        <div style={{ fontSize: '40px', marginBottom: '1rem' }}>⚠️</div>
         <h2 style={{ fontSize: '18px', fontWeight: 600, marginBottom: '.5rem' }}>Ошибка авторизации</h2>
         <p style={{ fontSize: '13px', color: 'var(--muted)', marginBottom: '1.5rem' }}>
           {searchParams.error === 'AccessDenied'

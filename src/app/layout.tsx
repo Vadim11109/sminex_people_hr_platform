@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter, Playfair_Display } from 'next/font/google'
+import { GlobalNav } from '@/components/layout/GlobalNav'
 import './globals.css'
 
 const inter = Inter({
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ru" className={`${inter.variable} ${playfair.variable}`}>
       <body style={{ fontFamily: 'var(--font-inter), system-ui, sans-serif' }}>
         {children}
+        <GlobalNav />
       </body>
     </html>
   )

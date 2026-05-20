@@ -7,9 +7,9 @@ export default async function ManagerLayout({ children }: { children: React.Reac
   const session = mockSession
 
   const navItems = [
-    { href: '/manager', icon: '👥', label: 'Моя команда' },
-    { href: '/manager/pending', icon: '✏️', label: 'Ожидают оценки', badge: 2 },
-    { href: '/manager/results', icon: '📊', label: 'Результаты' },
+    { href: '/manager', label: 'Моя команда' },
+    { href: '/manager/pending', label: 'Ожидают оценки', badge: 1 },
+    { href: '/manager/results', label: 'Результаты' },
   ]
 
   return (

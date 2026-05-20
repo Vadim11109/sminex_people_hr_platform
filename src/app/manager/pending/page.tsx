@@ -16,7 +16,11 @@ export default function ManagerPendingPage() {
           background: 'var(--amber-bg)', border: '1px solid var(--amber-light)', borderRadius: 'var(--radius)',
           padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', gap: '.875rem', alignItems: 'flex-start',
         }}>
-          <span style={{ fontSize: '18px', flexShrink: 0 }}>ℹ️</span>
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style={{ flexShrink: 0, marginTop: '1px' }}>
+            <circle cx="8" cy="8" r="7" stroke="var(--amber)" strokeWidth="1.5"/>
+            <rect x="7.25" y="7" width="1.5" height="5" rx=".75" fill="var(--amber)"/>
+            <circle cx="8" cy="4.5" r=".9" fill="var(--amber)"/>
+          </svg>
           <div style={{ fontSize: '13px', color: 'var(--amber)', lineHeight: 1.7 }}>
             <strong>Оценивайте только после того, как сотрудник завершил само-оценку.</strong>{' '}
             Сотрудники, не завершившие само-оценку, недоступны для оценки руководителем.

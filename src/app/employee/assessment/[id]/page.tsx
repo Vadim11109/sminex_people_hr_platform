@@ -117,10 +117,9 @@ export default function EmployeeAssessmentPage() {
         {/* Intro */}
         <div style={{
           background: 'var(--purple-bg, #F5EEFA)', border: '1px solid var(--purple-light, #CDB8E0)',
-          borderRadius: 'var(--radius)', padding: '1.25rem 1.75rem', marginBottom: '1.75rem',
-          display: 'flex', gap: '1rem', alignItems: 'flex-start',
+          borderLeft: '3px solid var(--purple)', borderRadius: 'var(--radius)',
+          padding: '1.25rem 1.75rem', marginBottom: '1.75rem',
         }}>
-          <span style={{ fontSize: '22px', flexShrink: 0, marginTop: 2 }}>💡</span>
           <p style={{ fontSize: '13px', color: '#3B0764', lineHeight: 1.65 }}>
             <strong>Как работает само-оценка.</strong> Для каждой компетенции оцените себя по каждому аспекту —
             кликните на описание уровня, которое лучше всего отражает вашу текущую практику.
@@ -237,11 +236,8 @@ export default function EmployeeAssessmentPage() {
                           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '.75rem' }}>
                             {([1, 2, 3] as const).map((level) => {
                               const text = level === 1 ? sub.j_self : level === 2 ? sub.m_self : sub.s_self
-                              const selCls = level === 1 ? 'sel-j' : level === 2 ? 'sel-m' : 'sel-s'
-                              const headBg  = level === 1 ? 'var(--blue-bg)'  : level === 2 ? 'var(--green-bg)'  : 'var(--amber-bg)'
-                              const headClr = level === 1 ? 'var(--blue)'     : level === 2 ? 'var(--green)'     : 'var(--amber)'
+                              const selBdr  = level === 1 ? 'var(--blue)'  : level === 2 ? 'var(--green)'  : 'var(--amber)'
                               const selBg   = level === 1 ? 'var(--blue-bg)'  : level === 2 ? 'var(--green-bg)'  : 'var(--amber-bg)'
-                              const selBdr  = level === 1 ? 'var(--blue)'     : level === 2 ? 'var(--green)'     : 'var(--amber)'
                               const selShadow = level === 1 ? 'rgba(42,84,128,.12)' : level === 2 ? 'rgba(46,107,72,.12)' : 'rgba(138,104,0,.12)'
                               const isSelected = val === level
                               return (
@@ -254,15 +250,13 @@ export default function EmployeeAssessmentPage() {
                                     background: isSelected ? selBg : 'var(--surface2)',
                                     boxShadow: isSelected ? `0 4px 16px ${selShadow}` : undefined,
                                     transform: isSelected ? 'translateY(-1px)' : undefined,
-                                    overflow: 'hidden',
+                                    padding: '12px 14px',
+                                    fontSize: '12px',
+                                    color: isSelected ? 'var(--text)' : 'var(--muted)',
+                                    lineHeight: 1.55,
                                   }}
                                 >
-                                  <div style={{ padding: '7px 14px', fontSize: '10px', fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', background: headBg, color: headClr }}>
-                                    {level === 1 ? 'Junior' : level === 2 ? 'Middle' : 'Senior'}
-                                  </div>
-                                  <div style={{ padding: '10px 14px', fontSize: '12px', color: isSelected ? 'var(--text)' : 'var(--muted)', lineHeight: 1.55 }}>
-                                    {text}
-                                  </div>
+                                  {text}
                                 </div>
                               )
                             })}

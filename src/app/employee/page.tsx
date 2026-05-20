@@ -10,7 +10,7 @@ export default async function EmployeeDashboard() {
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
           <span style={{ display: 'inline-flex', alignItems: 'center', gap: '.5rem', padding: '5px 12px', background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: '3px', fontSize: '12px', color: 'var(--muted)' }}>
-            🔔 1 активный цикл
+            1 активный цикл
           </span>
         </div>
       </div>
@@ -26,13 +26,12 @@ export default async function EmployeeDashboard() {
           borderRadius: 'var(--radius)', padding: '1.5rem 1.75rem', marginBottom: '1rem',
           display: 'flex', alignItems: 'center', gap: '1.5rem',
         }}>
-          <div style={{ fontSize: '28px' }}>📝</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '.25rem' }}>Q1 2025 — PO Assessment</div>
             <div style={{ fontSize: '12px', color: 'var(--muted)', display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-              <span>📅 Срок: 31 марта 2025</span>
-              <span>👤 Руководитель: Алексей Морозов</span>
-              <span>🏢 IT Products</span>
+              <span>Срок: 31 марта 2025</span>
+              <span>Руководитель: Алексей Воронов</span>
+              <span>IT-продукты</span>
             </div>
             <div style={{ marginTop: '.75rem', display: 'flex', alignItems: 'center', gap: '.75rem' }}>
               <div className="prog-track" style={{ width: '200px' }}>
@@ -60,20 +59,18 @@ export default async function EmployeeDashboard() {
           borderRadius: 'var(--radius)', padding: '1.5rem 1.75rem', marginBottom: '1rem',
           display: 'flex', alignItems: 'center', gap: '1.5rem', opacity: .7,
         }}>
-          <div style={{ fontSize: '28px' }}>✅</div>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '.25rem' }}>Q4 2024 — PO Assessment</div>
-            <div style={{ fontSize: '12px', color: 'var(--muted)' }}>📅 Завершён: 15 декабря 2024 · 👤 Алексей Морозов</div>
+            <div style={{ fontSize: '12px', color: 'var(--muted)' }}>Завершён: 15 декабря 2024 · Алексей Воронов</div>
           </div>
           <span className="status status-done">Завершён</span>
         </div>
 
         {/* Info note */}
         <div style={{
-          background: 'var(--amber-bg)', border: '1px solid var(--amber-light)', borderRadius: 'var(--radius)',
-          padding: '1rem 1.25rem', marginTop: '1.5rem', display: 'flex', gap: '.875rem', alignItems: 'flex-start',
+          background: 'var(--amber-bg)', border: '1px solid var(--amber-light)', borderLeft: '3px solid var(--amber)', borderRadius: 'var(--radius)',
+          padding: '1rem 1.25rem', marginTop: '1.5rem',
         }}>
-          <span style={{ fontSize: '18px', flexShrink: 0 }}>💡</span>
           <div style={{ fontSize: '13px', color: 'var(--amber)', lineHeight: 1.7 }}>
             <strong>Результаты само-оценки</strong> видны только вашему руководителю и HR — после завершения вы вместе разберёте результаты на 1:1.
           </div>

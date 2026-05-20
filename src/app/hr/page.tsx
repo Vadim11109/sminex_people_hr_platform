@@ -16,17 +16,17 @@ export default function HrDashboard() {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1rem', marginBottom: '1.75rem' }}>
           <div className="stat-card stat-accent-blue">
             <div className="stat-label">Сотрудников</div>
-            <div className="stat-value">48</div>
+            <div className="stat-value">33</div>
             <div className="stat-sub">всего в системе</div>
           </div>
           <div className="stat-card stat-accent-amber">
             <div className="stat-label">Само-оценок</div>
-            <div className="stat-value">12 / 48</div>
+            <div className="stat-value">12 / 33</div>
             <div className="stat-sub">в текущем цикле</div>
           </div>
           <div className="stat-card stat-accent-green">
             <div className="stat-label">Оценок руководителей</div>
-            <div className="stat-value">4 / 48</div>
+            <div className="stat-value">4 / 33</div>
             <div className="stat-sub">в текущем цикле</div>
           </div>
           <div className="stat-card stat-accent-purple">
@@ -48,12 +48,12 @@ export default function HrDashboard() {
             </div>
             <div className="card-body">
               {[
-                { team: 'IT Products', done: 4, total: 8 },
-                { team: 'Analytics', done: 3, total: 6 },
-                { team: 'Marketing', done: 2, total: 10 },
-                { team: 'Finance', done: 1, total: 7 },
-                { team: 'Operations', done: 2, total: 9 },
-                { team: 'Sales', done: 0, total: 8 },
+                { team: 'IT-продукты',       done: 4, total: 8 },
+                { team: 'Строительство',      done: 3, total: 6 },
+                { team: 'Коммерческий отдел', done: 2, total: 7 },
+                { team: 'Финансы',            done: 1, total: 5 },
+                { team: 'HR',                 done: 2, total: 4 },
+                { team: 'Управление',         done: 0, total: 3 },
               ].map(({ team, done, total }) => (
                 <div key={team} style={{ marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', marginBottom: '.375rem' }}>
@@ -122,10 +122,10 @@ export default function HrDashboard() {
               </thead>
               <tbody>
                 {[
-                  { name: 'Анна Сидорова', initials: 'АС', action: 'Завершила само-оценку', team: 'IT Products', time: '2 ч. назад' },
-                  { name: 'Алексей Морозов', initials: 'АМ', action: 'Оценил 2 сотрудников', team: 'IT Products', time: '5 ч. назад' },
-                  { name: 'Дмитрий Козлов', initials: 'ДК', action: 'Начал само-оценку', team: 'IT Products', time: 'вчера' },
-                  { name: 'Марина Волкова', initials: 'МВ', action: 'Завершила само-оценку', team: 'Analytics', time: 'вчера' },
+                  { name: 'Анна Сидорова',   initials: 'АС', action: 'Завершила само-оценку',  team: 'IT-продукты',       time: '2 ч. назад' },
+                  { name: 'Алексей Воронов', initials: 'АВ', action: 'Оценил 2 сотрудников',   team: 'IT-продукты',       time: '5 ч. назад' },
+                  { name: 'Дмитрий Козлов',  initials: 'ДК', action: 'Начал само-оценку',       team: 'IT-продукты',       time: 'вчера' },
+                  { name: 'Марина Волкова',  initials: 'МВ', action: 'Завершила само-оценку',  team: 'Строительство',     time: 'вчера' },
                 ].map(({ name, initials, action, team, time }) => (
                   <tr key={name}>
                     <td>

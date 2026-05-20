@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { use, useState, useCallback } from 'react'
 import { COMPETENCIES, getGradeInfo, getSummaryText } from '@/lib/assessment-data'
 
 type SubRatings = Record<string, number>   // "cid-si" → 0|1|2|3
@@ -21,8 +21,9 @@ const EMPLOYEES: Record<string, { name: string; initials: string; prevGrade: str
   '3': { name: 'Дмитрий Козлов',  initials: 'ДК', prevGrade: 'Джуниор Ранг 3', prevCls: 'badge-j' },
 }
 
-export default function ManagerAssessPage({ params }: { params: { userId: string } }) {
-  const emp = EMPLOYEES[params.userId] ?? { name: 'Сотрудник', initials: '??', prevGrade: '—', prevCls: 'badge-j' }
+export default function ManagerAssessPage({ params }: { params: Promise<{ userId: string }> }) {
+  const { userId } = use(params)
+  const emp = EMPLOYEES[userId] ?? { name: 'Сотрудник', initials: '??', prevGrade: '—', prevCls: 'badge-j' }
 
   const [subRatings, setSubRatings] = useState<SubRatings>({})
   const [comments,   setComments]   = useState<Comments>({})
@@ -92,7 +93,7 @@ export default function ManagerAssessPage({ params }: { params: { userId: string
             )}
             {gi && <p style={{ fontSize: '13px', color: 'var(--muted)', lineHeight: 1.6, marginBottom: '1.75rem' }}>{getSummaryText(overallAvg!, 9)}</p>}
             <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-              <a href={`/manager/gap/${params.userId}`} className="btn btn-primary">Gap-анализ →</a>
+              <a href={`/manager/gap/${userId}`} className="btn btn-primary">Gap-анализ →</a>
               <a href="/manager" className="btn">← К команде</a>
             </div>
           </div>

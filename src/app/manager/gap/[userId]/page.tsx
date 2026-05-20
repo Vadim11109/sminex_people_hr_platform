@@ -28,7 +28,6 @@ export default async function ManagerGapPage({ params }: Props) {
           <a href="/manager/results" style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '13px' }}>← Результаты</a>
         </div>
         <div className="page-body" style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--muted)' }}>
-          <div style={{ fontSize: 40, marginBottom: '1rem' }}>⚖️</div>
           <p>Обе оценки ещё не завершены — gap-анализ будет доступен после их заполнения.</p>
         </div>
       </>

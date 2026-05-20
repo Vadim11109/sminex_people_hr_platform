@@ -2,11 +2,10 @@ import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import type { UserRole } from '@prisma/client'
 
-const roleConfig: Record<UserRole, { label: string; tag: string; icon: string; desc: string; href: string; tagCls: string; cardCls: string }> = {
+const roleConfig: Record<UserRole, { label: string; tag: string; desc: string; href: string; tagCls: string; cardCls: string }> = {
   EMPLOYEE: {
     label: 'Само-оценка',
     tag: 'Сотрудник',
-    icon: '🧑‍💻',
     desc: 'Пройти ассесмент, посмотреть историю своих оценок',
     href: '/employee',
     tagCls: 'role-pill-employee',
@@ -15,7 +14,6 @@ const roleConfig: Record<UserRole, { label: string; tag: string; icon: string; d
   MANAGER: {
     label: 'Оценка команды',
     tag: 'Руководитель',
-    icon: '👥',
     desc: 'Оценить сотрудников, просмотреть gap-анализ и результаты',
     href: '/manager',
     tagCls: 'role-pill-manager',
@@ -24,7 +22,6 @@ const roleConfig: Record<UserRole, { label: string; tag: string; icon: string; d
   HR: {
     label: 'Аналитика и циклы',
     tag: 'HR',
-    icon: '📊',
     desc: 'Управлять циклами, видеть все результаты и аналитику',
     href: '/hr',
     tagCls: 'role-pill-hr',
@@ -86,8 +83,7 @@ export default async function SelectRolePage() {
                 <span className={`role-pill ${cfg.tagCls}`} style={{ fontSize: '10px', display: 'inline-block', marginBottom: '.875rem' }}>
                   {cfg.tag}
                 </span>
-                <div style={{ fontSize: '28px', marginBottom: '1rem' }}>{cfg.icon}</div>
-                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)', marginBottom: '.375rem' }}>{cfg.label}</div>
+                <div style={{ fontSize: '15px', fontWeight: 600, color: 'var(--text)', marginBottom: '.375rem', marginTop: '.25rem' }}>{cfg.label}</div>
                 <div style={{ fontSize: '12px', color: 'var(--muted)', lineHeight: 1.6 }}>{cfg.desc}</div>
                 <div style={{ position: 'absolute', top: '1.25rem', right: '1.25rem', color: 'var(--hint)', fontSize: '18px' }}>›</div>
               </a>
@@ -95,8 +91,8 @@ export default async function SelectRolePage() {
           })}
         </div>
 
-        <p style={{ marginTop: '1.75rem', fontSize: '12px', color: 'var(--hint)', display: 'flex', alignItems: 'center', gap: '.5rem', justifyContent: 'center' }}>
-          🔒 Роли назначаются HR-администратором · изменить самостоятельно нельзя
+        <p style={{ marginTop: '1.75rem', fontSize: '12px', color: 'var(--hint)', textAlign: 'center' }}>
+          Роли назначаются HR-администратором · изменить самостоятельно нельзя
         </p>
       </div>
     </div>

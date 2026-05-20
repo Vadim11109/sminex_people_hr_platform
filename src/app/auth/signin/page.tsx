@@ -18,7 +18,7 @@ export default function SignInPage() {
         textAlign: 'center',
       }}>
         {/* Logo */}
-        <div style={{ marginBottom: '2.5rem' }}>
+        <div style={{ marginBottom: '2.5rem', display: 'flex', justifyContent: 'center' }}>
           <svg width="110" height="34" viewBox="0 0 110 34" fill="none">
             <text x="0" y="20" fontFamily="Georgia,serif" fontSize="22" fontWeight="700" letterSpacing="2.5" fill="#1C1B18">SMINEX</text>
             <line x1="0" y1="24" x2="110" y2="24" stroke="#C9C5BC" strokeWidth="0.75"/>

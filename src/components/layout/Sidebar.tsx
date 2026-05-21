@@ -48,19 +48,28 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div style={{
-          fontFamily: 'var(--font-playfair), Georgia, serif',
-          fontSize: '22px', fontWeight: 700,
-          letterSpacing: '.06em', color: 'var(--text)',
-          lineHeight: 1,
-        }}>
-          SMINEX
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.625rem', justifyContent: 'center' }}>
+          <span style={{
+            fontFamily: 'var(--font-playfair), Georgia, serif',
+            fontSize: '18px', fontWeight: 700,
+            letterSpacing: '.06em', color: 'var(--text)', lineHeight: 1,
+          }}>
+            SMINEX
+          </span>
+          <span style={{ width: 1, height: 14, background: 'var(--border2)', flexShrink: 0, display: 'block' }} />
+          <span style={{
+            fontSize: '11px', fontWeight: 600,
+            letterSpacing: '.16em', color: 'var(--muted)',
+            textTransform: 'uppercase', lineHeight: 1,
+          }}>
+            People
+          </span>
         </div>
         <div style={{
-          fontSize: '10px', letterSpacing: '.22em', color: 'var(--hint)',
-          textTransform: 'uppercase', marginTop: '7px', fontWeight: 500,
+          fontSize: '9px', letterSpacing: '.2em', color: 'var(--hint)',
+          textTransform: 'uppercase', marginTop: '6px', fontWeight: 400, textAlign: 'center',
         }}>
-          PEOPLE · HR PLATFORM
+          HR Platform
         </div>
       </div>
 

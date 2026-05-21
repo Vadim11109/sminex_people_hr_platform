@@ -137,10 +137,13 @@ body {
 
 .main-area {
   flex: 1;
-  margin-left: 248px;
+  margin: 12px 12px 12px 248px;
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: calc(100vh - 24px);
+  background: var(--surface);
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.08);
 }
 
 .topbar {
@@ -151,8 +154,9 @@ body {
   align-items: center;
   justify-content: space-between;
   position: sticky;
-  top: 0;
+  top: 12px;
   z-index: 5;
+  border-radius: 12px 12px 0 0;
 }
 
 .page-body { padding: 2rem 2.5rem; flex: 1; }

@@ -62,7 +62,7 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
             fontSize: '22px', fontWeight: 700,
             letterSpacing: '.06em', color: 'var(--text)', lineHeight: 1,
           }}>
-            People
+            PEOPLE
           </span>
         </div>
         <div style={{

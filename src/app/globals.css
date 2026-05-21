@@ -276,6 +276,23 @@ body {
 .tbl tr:last-child td { border-bottom: none; }
 .tbl tr:hover td { background: var(--surface2); }
 
+/* Form fields */
+.field {
+  width: 100%;
+  padding: 7px 10px;
+  font-size: 13px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  font-family: inherit;
+  transition: border-color .15s;
+  line-height: 1.5;
+}
+.field:focus { border-color: var(--blue); }
+.field::placeholder { color: var(--hint); }
+
 /* Progress */
 .prog-track { height: 5px; background: var(--surface2); border-radius: 99px; border: 1px solid var(--border); overflow: hidden; }
 .prog-fill { height: 100%; border-radius: 99px; transition: width .4s ease; }

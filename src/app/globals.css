@@ -55,36 +55,42 @@ body {
 .sidebar {
   width: 224px;
   background: var(--surface);
-  border-right: 1px solid var(--border);
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,.08);
   display: flex;
   flex-direction: column;
   flex-shrink: 0;
   position: fixed;
   top: 0;
   left: 0;
-  height: 100vh;
+  margin: 12px;
+  height: calc(100vh - 24px);
   z-index: 10;
+  overflow: hidden;
 }
 
 .sidebar-logo {
-  padding: 1.375rem 1.5rem;
+  padding: 1.625rem 1.25rem 1.375rem;
   border-bottom: 1px solid var(--border);
+  text-align: center;
 }
 
 
-.nav-section { padding: .625rem 0; }
+.nav-section { padding: .5rem 8px; }
 
 .nav-item {
   display: flex;
   align-items: center;
   gap: .75rem;
-  padding: .5rem 1.5rem;
+  padding: .5rem .875rem;
   font-size: 13px;
   font-weight: 500;
   color: var(--muted);
   cursor: pointer;
   transition: all .15s;
-  border-left: 2px solid transparent;
+  border-left: none;
+  border-radius: 8px;
   text-decoration: none;
   user-select: none;
 }
@@ -93,14 +99,14 @@ body {
 .nav-item.active {
   background: var(--blue-bg);
   color: var(--blue);
-  border-left-color: var(--blue);
+  border-radius: 8px;
   font-weight: 600;
 }
 
 
 .sidebar-bottom {
   margin-top: auto;
-  padding: 1.125rem 1.5rem;
+  padding: 1.125rem 1.25rem;
   border-top: 1px solid var(--border);
 }
 
@@ -131,7 +137,7 @@ body {
 
 .main-area {
   flex: 1;
-  margin-left: 224px;
+  margin-left: 248px;
   display: flex;
   flex-direction: column;
   min-height: 100vh;

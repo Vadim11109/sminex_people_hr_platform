@@ -9,6 +9,7 @@ interface NavItem {
   href: string
   label: string
   badge?: number
+  exact?: boolean  // if true — only highlight on exact path match
 }
 
 interface SidebarProps {
@@ -78,7 +79,7 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
           <Link
             key={item.href}
             href={item.href}
-            className={`nav-item ${pathname === item.href || pathname.startsWith(item.href + '/') ? 'active' : ''}`}
+            className={`nav-item ${pathname === item.href || (!item.exact && pathname.startsWith(item.href + '/')) ? 'active' : ''}`}
           >
             <span style={{ flex: 1 }}>{item.label}</span>
             {item.badge ? (

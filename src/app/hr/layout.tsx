@@ -7,7 +7,7 @@ export default async function HrLayout({ children }: { children: React.ReactNode
   const session = mockSession
 
   const navItems = [
-    { href: '/hr', label: 'Дашборд' },
+    { href: '/hr', label: 'Дашборд', exact: true },
     { href: '/hr/cycles', label: 'Циклы оценки' },
     { href: '/hr/users', label: 'Сотрудники' },
     { href: '/hr/analytics', label: 'Аналитика' },

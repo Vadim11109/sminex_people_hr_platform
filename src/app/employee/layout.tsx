@@ -7,7 +7,7 @@ export default async function EmployeeLayout({ children }: { children: React.Rea
   const session = mockSession
 
   const navItems = [
-    { href: '/employee', label: 'Мои ассесменты', badge: 1 },
+    { href: '/employee', label: 'Мои ассесменты', badge: 1, exact: true },
     { href: '/employee/history', label: 'История' },
   ]
 

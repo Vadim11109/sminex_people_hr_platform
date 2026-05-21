@@ -141,25 +141,25 @@ body {
   display: flex;
   flex-direction: column;
   min-height: calc(100vh - 24px);
-  background: var(--surface);
+  background: var(--bg);
   border-radius: 12px;
   box-shadow: 0 2px 16px rgba(0,0,0,.08);
+  overflow: clip;
 }
 
 .topbar {
   background: var(--surface);
   border-bottom: 1px solid var(--border);
-  padding: .875rem 2.5rem;
+  padding: .875rem 2rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   position: sticky;
-  top: 12px;
+  top: 0;
   z-index: 5;
-  border-radius: 12px 12px 0 0;
 }
 
-.page-body { padding: 2rem 2.5rem; flex: 1; }
+.page-body { padding: 1.75rem 2rem; flex: 1; background: var(--bg); }
 
 /* ─── COMPONENTS ─────────────────────────────────────────────── */
 
@@ -192,7 +192,9 @@ body {
 .card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
+  overflow: hidden;
 }
 
 .card-head {
@@ -212,7 +214,8 @@ body {
 .stat-card {
   background: var(--surface);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 10px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.05);
   padding: 1.25rem 1.5rem;
 }
 .stat-label { font-size: 10px; font-weight: 600; color: var(--hint); letter-spacing: .15em; text-transform: uppercase; margin-bottom: .5rem; }

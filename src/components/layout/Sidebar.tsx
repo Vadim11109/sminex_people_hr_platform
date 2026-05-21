@@ -48,26 +48,26 @@ export function Sidebar({ user, role, navItems }: SidebarProps) {
   return (
     <aside className="sidebar">
       <div className="sidebar-logo">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '.625rem', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem', justifyContent: 'center' }}>
           <span style={{
             fontFamily: 'var(--font-playfair), Georgia, serif',
-            fontSize: '18px', fontWeight: 700,
+            fontSize: '22px', fontWeight: 700,
             letterSpacing: '.06em', color: 'var(--text)', lineHeight: 1,
           }}>
             SMINEX
           </span>
-          <span style={{ width: 1, height: 14, background: 'var(--border2)', flexShrink: 0, display: 'block' }} />
+          <span style={{ width: 1, height: 18, background: 'var(--border2)', flexShrink: 0, display: 'block' }} />
           <span style={{
-            fontSize: '11px', fontWeight: 600,
-            letterSpacing: '.16em', color: 'var(--muted)',
-            textTransform: 'uppercase', lineHeight: 1,
+            fontFamily: 'var(--font-playfair), Georgia, serif',
+            fontSize: '22px', fontWeight: 700,
+            letterSpacing: '.06em', color: 'var(--text)', lineHeight: 1,
           }}>
             People
           </span>
         </div>
         <div style={{
           fontSize: '9px', letterSpacing: '.2em', color: 'var(--hint)',
-          textTransform: 'uppercase', marginTop: '6px', fontWeight: 400, textAlign: 'center',
+          textTransform: 'uppercase', marginTop: '7px', fontWeight: 400, textAlign: 'center',
         }}>
           HR Platform
         </div>

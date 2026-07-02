@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect } from 'react'
 import { COMPETENCIES, FREQ_LABELS, getGradeInfo } from '@/lib/assessment-data'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
@@ -26,6 +26,38 @@ export default function EmployeeAssessmentPage() {
   const [generalNote,  setGeneralNote]  = useState('')
   const [openCards,    setOpenCards]    = useState<OpenCards>({})
   const [submitted,    setSubmitted]    = useState(false)
+  const [draftRestored, setDraftRestored] = useState(false)
+
+  const draftKey = 'po-assessment-draft-self'
+
+  // Восстановление черновика при открытии страницы
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(draftKey)
+      if (!raw) return
+      const draft = JSON.parse(raw)
+      if (draft.subRatings) setSubRatings(draft.subRatings)
+      if (draft.freqAnswers) setFreqAnswers(draft.freqAnswers)
+      if (draft.examples) setExamples(draft.examples)
+      if (draft.compExamples) setCompExamples(draft.compExamples)
+      if (typeof draft.generalNote === 'string') setGeneralNote(draft.generalNote)
+      setDraftRestored(true)
+    } catch {}
+  }, [])
+
+  // Автосохранение черновика при каждом изменении
+  useEffect(() => {
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({
+        subRatings, freqAnswers, examples, compExamples, generalNote, savedAt: new Date().toISOString(),
+      }))
+    } catch {}
+  }, [subRatings, freqAnswers, examples, compExamples, generalNote])
+
+  function handleSubmit() {
+    try { localStorage.removeItem(draftKey) } catch {}
+    setSubmitted(true)
+  }
 
   // ── helpers ──
   const toggleCard = useCallback((key: string) =>
@@ -114,6 +146,19 @@ export default function EmployeeAssessmentPage() {
       </div>
 
       <div className="page-body">
+        {draftRestored && (
+          <div style={{
+            background: 'var(--green-bg)', border: '1px solid var(--green-light)',
+            borderLeft: '3px solid var(--green)', borderRadius: 'var(--radius)',
+            padding: '.875rem 1.25rem', marginBottom: '1.25rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: '13px', color: 'var(--green)' }}>
+              Восстановлен черновик, сохранённый ранее — можно продолжить с того же места.
+            </span>
+            <button className="btn btn-sm" onClick={() => setDraftRestored(false)}>Понятно</button>
+          </div>
+        )}
         {/* Intro */}
         <div style={{
           background: 'var(--purple-bg, #F5EEFA)', border: '1px solid var(--purple-light, #CDB8E0)',
@@ -378,7 +423,7 @@ export default function EmployeeAssessmentPage() {
         <div style={{ display: 'flex', gap: '.75rem', marginTop: '1.75rem', paddingBottom: '3rem', flexWrap: 'wrap' }}>
           <button
             className="btn btn-primary"
-            onClick={() => setSubmitted(true)}
+            onClick={handleSubmit}
             disabled={!allDone}
             style={{ opacity: allDone ? 1 : .45, background: 'var(--purple)', borderColor: 'var(--purple)' }}
           >

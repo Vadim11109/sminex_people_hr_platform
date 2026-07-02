@@ -1,6 +1,6 @@
 'use client'
 
-import { use, useState, useCallback } from 'react'
+import { use, useState, useCallback, useEffect } from 'react'
 import { COMPETENCIES, getGradeInfo, getSummaryText } from '@/lib/assessment-data'
 
 type SubRatings = Record<string, number>   // "cid-si" → 0|1|2|3 (0 = компетенция отсутствует)
@@ -33,6 +33,38 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
   const [openCards,  setOpenCards]  = useState<OpenCards>({})
   const [openSubs,   setOpenSubs]   = useState<OpenCards>({})
   const [saved,      setSaved]      = useState(false)
+  const [draftRestored, setDraftRestored] = useState(false)
+
+  const draftKey = `po-assessment-draft-mgr-${userId}`
+
+  // Восстановление черновика при открытии страницы
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(draftKey)
+      if (!raw) return
+      const draft = JSON.parse(raw)
+      if (draft.subRatings) setSubRatings(draft.subRatings)
+      if (draft.subSkipped) setSubSkipped(draft.subSkipped)
+      if (draft.comments) setComments(draft.comments)
+      if (typeof draft.generalNote === 'string') setGeneralNote(draft.generalNote)
+      setDraftRestored(true)
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [draftKey])
+
+  // Автосохранение черновика при каждом изменении
+  useEffect(() => {
+    try {
+      localStorage.setItem(draftKey, JSON.stringify({
+        subRatings, subSkipped, comments, generalNote, savedAt: new Date().toISOString(),
+      }))
+    } catch {}
+  }, [draftKey, subRatings, subSkipped, comments, generalNote])
+
+  function handleSaveComplete() {
+    try { localStorage.removeItem(draftKey) } catch {}
+    setSaved(true)
+  }
 
   const toggleCard = useCallback((k: string) =>
     setOpenCards(p => ({ ...p, [k]: !p[k] })), [])
@@ -140,6 +172,41 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
       </div>
 
       <div className="page-body">
+        {draftRestored && (
+          <div style={{
+            background: 'var(--green-bg)', border: '1px solid var(--green-light)',
+            borderLeft: '3px solid var(--green)', borderRadius: 'var(--radius)',
+            padding: '.875rem 1.25rem', marginBottom: '1.25rem',
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '1rem', flexWrap: 'wrap',
+          }}>
+            <span style={{ fontSize: '13px', color: 'var(--green)' }}>
+              Восстановлен черновик, сохранённый ранее — можно продолжить с того же места.
+            </span>
+            <button className="btn btn-sm" onClick={() => setDraftRestored(false)}>Понятно</button>
+          </div>
+        )}
+        {/* Intro */}
+        <div style={{
+          background: 'var(--blue-bg)', border: '1px solid var(--blue-light)',
+          borderLeft: '3px solid var(--blue)', borderRadius: 'var(--radius)',
+          padding: '1.25rem 1.75rem', marginBottom: '1.25rem',
+        }}>
+          <p style={{ fontSize: '13px', color: 'var(--text)', lineHeight: 1.7, marginBottom: '.75rem' }}>
+            Перед вами анкета для оценки компетенций сотрудника. Пожалуйста, следуйте нижеприведённой инструкции:
+          </p>
+          <ul style={{ margin: 0, paddingLeft: '1.25rem', fontSize: '13px', color: 'var(--text)', lineHeight: 1.7, listStyle: 'disc' }}>
+            <li style={{ marginBottom: '.5rem' }}>Ознакомьтесь с компетенциями и поведенческими индикаторами. Каждый индикатор описывает конкретное поведение, которое может наблюдаться в рабочей деятельности. Оценивать нужно не личные качества, а фактическое поведение сотрудника в профессиональной среде.</li>
+            <li style={{ marginBottom: '.5rem' }}>Оцените каждую компетенцию, выбрав подходящее описание поведения сотрудника. В крайних случаях используйте ответ «не могу оценить».</li>
+            <li style={{ marginBottom: '.5rem' }}>Будьте объективны и последовательны. Оценивайте на основе последних 6–12 месяцев работы.</li>
+            <li style={{ marginBottom: '.5rem' }}>Заполните анкету целиком. Не пропускайте компетенции и индикаторы. Не оставляйте пустых полей, там где их заполнение обязательно.</li>
+            <li>Завершите анкету в срок. Заполнение анкеты обычно занимает до 20 мин. По каждому блоку вы можете оставить комментарий.</li>
+          </ul>
+          <p style={{ fontSize: '13px', color: 'var(--text)', lineHeight: 1.7, marginTop: '.75rem', marginBottom: 0 }}>
+            Ваши ответы будут сохраняться по мере прохождения опросника, так что при необходимости вы можете закрыть его и завершить позже.<br />
+            Спасибо вам за участие и вклад в развитие сотрудников!
+          </p>
+        </div>
+
         {/* Employee header */}
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <div className="card-body" style={{ display: 'flex', alignItems: 'center', gap: '1.25rem' }}>
@@ -400,7 +467,7 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
         <div style={{ display: 'flex', gap: '.75rem', marginTop: '1.75rem', paddingBottom: '3rem', flexWrap: 'wrap' }}>
           <button
             className="btn btn-primary"
-            onClick={() => setSaved(true)}
+            onClick={handleSaveComplete}
             disabled={!allDone}
             style={{ opacity: allDone ? 1 : .45 }}
           >

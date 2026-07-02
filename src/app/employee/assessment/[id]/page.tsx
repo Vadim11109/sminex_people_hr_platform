@@ -268,7 +268,7 @@ export default function EmployeeAssessmentPage() {
                     {/* Competency example */}
                     <div style={{ marginTop: '1rem' }}>
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--hint)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
-                        Кейс или конкретный пример из практики
+                        Кейс или конкретный пример из практики <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(опционально, необязательно для заполнения)</span>
                       </label>
                       <textarea
                         value={compExamples[comp.id] ?? ''}
@@ -332,7 +332,7 @@ export default function EmployeeAssessmentPage() {
                           {selected !== undefined && (
                             <div style={{ marginTop: '.75rem' }}>
                               <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--hint)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
-                                Конкретный пример из практики
+                                Конкретный пример из практики <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(опционально, необязательно для заполнения)</span>
                               </label>
                               <textarea
                                 value={examples[comp.id]?.[qi] ?? ''}
@@ -360,7 +360,7 @@ export default function EmployeeAssessmentPage() {
         {/* General note */}
         <div style={{ marginTop: '1.75rem', paddingTop: '1.75rem', borderTop: '1px solid var(--border)' }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: 7 }}>
-            Что хочу развивать — мои приоритеты роста
+            Что хочу развивать — мои приоритеты роста <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(опционально, необязательно для заполнения)</span>
           </label>
           <textarea
             value={generalNote}

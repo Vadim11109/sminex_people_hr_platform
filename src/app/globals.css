@@ -242,6 +242,8 @@ body {
 .badge-m { background: var(--green-bg); color: var(--green); border-color: var(--green-light); }
 .badge-s { background: var(--amber-bg); color: var(--amber); border-color: var(--amber-light); }
 .badge-none { background: var(--surface2); color: var(--hint); border-color: var(--border); }
+.badge-0 { background: var(--red-bg, #FEF2F2); color: var(--red, #991B1B); border-color: var(--red-light, #FECACA); }
+.badge-skip { background: var(--surface2); color: var(--hint); border-color: var(--border); font-style: italic; }
 
 .status {
   display: inline-flex;

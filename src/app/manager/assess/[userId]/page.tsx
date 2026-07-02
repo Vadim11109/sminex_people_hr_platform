@@ -3,7 +3,8 @@
 import { use, useState, useCallback } from 'react'
 import { COMPETENCIES, getGradeInfo, getSummaryText } from '@/lib/assessment-data'
 
-type SubRatings = Record<string, number>   // "cid-si" → 0|1|2|3
+type SubRatings = Record<string, number>   // "cid-si" → 0|1|2|3 (0 = компетенция отсутствует)
+type SubSkipped = Record<string, boolean>  // "cid-si" → не могу оценить (исключается из среднего балла)
 type Comments   = Record<string, string>   // cid → text
 type OpenCards  = Record<string, boolean>
 
@@ -26,6 +27,7 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
   const emp = EMPLOYEES[userId] ?? { name: 'Сотрудник', initials: '??', prevGrade: '—', prevCls: 'badge-j' }
 
   const [subRatings, setSubRatings] = useState<SubRatings>({})
+  const [subSkipped, setSubSkipped] = useState<SubSkipped>({})
   const [comments,   setComments]   = useState<Comments>({})
   const [generalNote, setGeneralNote] = useState('')
   const [openCards,  setOpenCards]  = useState<OpenCards>({})
@@ -37,17 +39,35 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
   const toggleSub = useCallback((k: string) =>
     setOpenSubs(p => ({ ...p, [k]: !p[k] })), [])
 
-  const setSub = useCallback((cid: number, si: number, val: number) =>
-    setSubRatings(p => ({ ...p, [`${cid}-${si}`]: val })), [])
+  const setSub = useCallback((cid: number, si: number, val: number) => {
+    const key = `${cid}-${si}`
+    setSubRatings(p => ({ ...p, [key]: val }))
+    setSubSkipped(p => ({ ...p, [key]: false }))
+  }, [])
 
+  const setSkip = useCallback((cid: number, si: number) => {
+    const key = `${cid}-${si}`
+    setSubSkipped(p => ({ ...p, [key]: true }))
+    setSubRatings(p => { const n = { ...p }; delete n[key]; return n })
+  }, [])
+
+  function isSubAnswered(cid: number, si: number): boolean {
+    const key = `${cid}-${si}`
+    return subRatings[key] !== undefined || !!subSkipped[key]
+  }
+
+  // Средний балл считается только по пунктам с числовой оценкой — «не могу оценить» из расчёта исключается
   function getCompScore(cid: number): number | undefined {
     const comp = COMPETENCIES.find(c => c.id === cid)!
-    if (!comp.subs.every((_, i) => subRatings[`${cid}-${i}`] !== undefined)) return undefined
-    return comp.subs.reduce((sum, _, i) => sum + subRatings[`${cid}-${i}`], 0) / comp.subs.length
+    if (!comp.subs.every((_, i) => isSubAnswered(cid, i))) return undefined
+    const rated = comp.subs.map((_, i) => subRatings[`${cid}-${i}`]).filter((v): v is number => v !== undefined)
+    if (rated.length === 0) return undefined
+    return rated.reduce((a, b) => a + b, 0) / rated.length
   }
 
   function isCompDone(cid: number): boolean {
-    return getCompScore(cid) !== undefined
+    const comp = COMPETENCIES.find(c => c.id === cid)!
+    return comp.subs.every((_, i) => isSubAnswered(cid, i))
   }
 
   const doneCount = COMPETENCIES.filter(c => isCompDone(c.id)).length
@@ -156,7 +176,8 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
           const open  = !!openCards[`c-${comp.id}`]
           const gi    = done ? getGradeInfo(score!) : null
           const css   = gi ? gradeCss(gi.grade) : null
-          const rated = comp.subs.filter((_, i) => subRatings[`${comp.id}-${i}`] !== undefined).length
+          const answered = comp.subs.filter((_, i) => isSubAnswered(comp.id, i)).length
+          const allAnswered = answered === comp.subs.length
 
           const borderColor = done
             ? (gi!.grade === 'S' ? 'var(--amber)' : gi!.grade === 'M' ? 'var(--green)' : gi!.grade === 'J' ? 'var(--blue)' : 'var(--border2)')
@@ -200,13 +221,21 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
                   }}>
                     {gi.label} ({score!.toFixed(1)})
                   </span>
+                ) : allAnswered ? (
+                  <span style={{
+                    display: 'inline-flex', alignItems: 'center', padding: '3px 10px', borderRadius: 2,
+                    fontSize: 11, fontWeight: 600, border: '1px solid var(--border)',
+                    background: 'var(--surface2)', color: 'var(--hint)', letterSpacing: '.3px', fontStyle: 'italic',
+                  }}>
+                    недостаточно данных
+                  </span>
                 ) : (
                   <span style={{
                     display: 'inline-flex', alignItems: 'center', padding: '3px 10px', borderRadius: 2,
                     fontSize: 11, fontWeight: 600, border: '1px solid var(--border)',
                     background: 'var(--surface2)', color: 'var(--hint)', letterSpacing: '.3px',
                   }}>
-                    {rated > 0 ? `${rated}/${comp.subs.length}` : 'не оценено'}
+                    {answered > 0 ? `${answered}/${comp.subs.length}` : 'не оценено'}
                   </span>
                 )}
                 <span style={{ color: 'var(--hint)', fontSize: 16, transition: 'transform .18s', transform: open ? 'rotate(90deg)' : undefined }}>›</span>
@@ -218,9 +247,10 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
                   {comp.subs.map((sub, si) => {
                     const key = `${comp.id}-${si}`
                     const val = subRatings[key]
+                    const skipped = !!subSkipped[key]
                     const subOpen = !!openSubs[key]
-                    const subbadge = val === undefined ? '—' : val === 0 ? '✕' : val === 1 ? 'J' : val === 2 ? 'M' : 'S'
-                    const subbadgeCls = val === undefined ? 'badge-none' : val === 0 ? 'badge-0' : val === 1 ? 'badge-j' : val === 2 ? 'badge-m' : 'badge-s'
+                    const subbadge = skipped ? '?' : val === undefined ? '—' : val === 0 ? '⊘' : val === 1 ? 'J' : val === 2 ? 'M' : 'S'
+                    const subbadgeCls = skipped ? 'badge-skip' : val === undefined ? 'badge-none' : val === 0 ? 'badge-0' : val === 1 ? 'badge-j' : val === 2 ? 'badge-m' : 'badge-s'
 
                     return (
                       <div key={si} style={{ border: '1px solid var(--border)', borderRadius: 3, marginBottom: '.625rem', overflow: 'hidden' }}>
@@ -246,15 +276,14 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
                         {/* Sub body */}
                         {subOpen && (
                           <div style={{ padding: '1rem 1.125rem', borderTop: '1px solid var(--border)', background: 'var(--surface2)' }}>
-                            {/* Criteria grid */}
-                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '.75rem', marginBottom: '1.25rem' }}>
-                              {([1, 2, 3] as const).map(level => {
-                                const text = level === 1 ? sub.j : level === 2 ? sub.m : sub.s
-                                const headBg  = level === 1 ? 'var(--blue-bg)'  : level === 2 ? 'var(--green-bg)'  : 'var(--amber-bg)'
-                                const headClr = level === 1 ? 'var(--blue)'     : level === 2 ? 'var(--green)'     : 'var(--amber)'
-                                const selBdr  = level === 1 ? 'var(--blue)'     : level === 2 ? 'var(--green)'     : 'var(--amber)'
-                                const selShadow = level === 1 ? 'rgba(42,84,128,.12)' : level === 2 ? 'rgba(46,107,72,.12)' : 'rgba(138,104,0,.12)'
-                                const isSel = val === level
+                            {/* Criteria grid — без наименований Jr/Middle/Sr, руководитель выбирает по описанию поведения */}
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '.75rem', marginBottom: '1.25rem' }}>
+                              {([0, 1, 2, 3] as const).map(level => {
+                                const text = level === 0 ? 'Компетенция отсутствует / не проявилась' : level === 1 ? sub.j : level === 2 ? sub.m : sub.s
+                                const selBdr  = level === 0 ? 'var(--red, #991B1B)' : level === 1 ? 'var(--blue)' : level === 2 ? 'var(--green)' : 'var(--amber)'
+                                const selBg   = level === 0 ? 'var(--red-bg, #FEF2F2)' : level === 1 ? 'var(--blue-bg)' : level === 2 ? 'var(--green-bg)' : 'var(--amber-bg)'
+                                const selShadow = level === 0 ? 'rgba(153,27,27,.12)' : level === 1 ? 'rgba(42,84,128,.12)' : level === 2 ? 'rgba(46,107,72,.12)' : 'rgba(138,104,0,.12)'
+                                const isSel = !skipped && val === level
                                 return (
                                   <div
                                     key={level}
@@ -262,34 +291,35 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
                                     style={{
                                       borderRadius: 3, cursor: 'pointer', transition: 'all .15s', overflow: 'hidden',
                                       border: `1.5px solid ${isSel ? selBdr : 'var(--border)'}`,
-                                      background: isSel ? (level === 1 ? 'var(--blue-bg)' : level === 2 ? 'var(--green-bg)' : 'var(--amber-bg)') : 'var(--surface)',
+                                      background: isSel ? selBg : 'var(--surface)',
                                       boxShadow: isSel ? `0 4px 16px ${selShadow}` : undefined,
                                       transform: isSel ? 'translateY(-1px)' : undefined,
+                                      padding: '10px 14px', fontSize: 12, lineHeight: 1.55,
+                                      color: level === 0 ? 'var(--red, #991B1B)' : 'var(--muted)',
+                                      fontStyle: level === 0 ? 'italic' : undefined,
                                     }}
                                   >
-                                    <div style={{ padding: '7px 14px', fontSize: 10, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', background: headBg, color: headClr }}>
-                                      {level === 1 ? 'Junior' : level === 2 ? 'Middle' : 'Senior'}
-                                    </div>
-                                    <div style={{ padding: '10px 14px', fontSize: 12, color: 'var(--muted)', lineHeight: 1.55 }}>{text}</div>
+                                    {text}
                                   </div>
                                 )
                               })}
                             </div>
 
-                            {/* Not shown button */}
+                            {/* Cannot assess */}
                             <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
                               <span style={{ fontSize: 11, fontWeight: 600, color: 'var(--muted)', letterSpacing: '.1em', textTransform: 'uppercase' }}>Оценка:</span>
                               <button
-                                onClick={() => setSub(comp.id, si, 0)}
+                                onClick={() => setSkip(comp.id, si)}
                                 style={{
                                   padding: '6px 16px', borderRadius: 3, fontSize: 12, fontWeight: 500,
                                   cursor: 'pointer', fontFamily: 'inherit', transition: 'all .15s',
-                                  background: val === 0 ? 'var(--red-bg, #FEF2F2)' : 'var(--surface)',
-                                  border: `1.5px solid ${val === 0 ? 'var(--red, #991B1B)' : 'var(--border)'}`,
-                                  color: val === 0 ? 'var(--red, #991B1B)' : 'var(--muted)',
+                                  background: skipped ? 'var(--surface2)' : 'var(--surface)',
+                                  border: `1.5px solid ${skipped ? 'var(--hint)' : 'var(--border)'}`,
+                                  color: skipped ? 'var(--text)' : 'var(--muted)',
+                                  fontStyle: skipped ? 'italic' : undefined,
                                 }}
                               >
-                                ✕ Не показывает
+                                ? Не могу оценить
                               </button>
                             </div>
                           </div>
@@ -310,12 +340,19 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
                       }}>
                         {gi.label} ({score!.toFixed(1)})
                       </span>
+                    ) : allAnswered ? (
+                      <span style={{
+                        display: 'inline-flex', padding: '3px 10px', borderRadius: 2, fontSize: 11, fontWeight: 600,
+                        border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--hint)', letterSpacing: '.3px', fontStyle: 'italic',
+                      }}>
+                        недостаточно данных для оценки
+                      </span>
                     ) : (
                       <span style={{
                         display: 'inline-flex', padding: '3px 10px', borderRadius: 2, fontSize: 11, fontWeight: 600,
                         border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--hint)', letterSpacing: '.3px',
                       }}>
-                        {rated > 0 ? `${rated}/${comp.subs.length} оценено` : 'оцените все пункты'}
+                        {answered > 0 ? `${answered}/${comp.subs.length} оценено` : 'оцените все пункты'}
                       </span>
                     )}
                   </div>
@@ -323,7 +360,7 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
                   {/* Comment */}
                   <div style={{ marginTop: '1.25rem', paddingTop: '1.25rem', borderTop: '1px solid var(--border)' }}>
                     <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--hint)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 6 }}>
-                      Комментарий и наблюдения
+                      Комментарий и наблюдения <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(опционально, необязательно для заполнения)</span>
                     </label>
                     <textarea
                       value={comments[comp.id] ?? ''}
@@ -345,7 +382,7 @@ export default function ManagerAssessPage({ params }: { params: Promise<{ userId
         {/* General comment */}
         <div style={{ marginTop: '1.75rem', paddingTop: '1.75rem', borderTop: '1px solid var(--border)' }}>
           <label style={{ display: 'block', fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: 7 }}>
-            Итоговые комментарии руководителя
+            Итоговые комментарии руководителя <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(опционально, необязательно для заполнения)</span>
           </label>
           <textarea
             value={generalNote}

@@ -1,17 +1,27 @@
+'use client'
+
+import { use, useState } from 'react'
 import { COMPETENCIES, getGradeInfo, getSummaryText } from '@/lib/assessment-data'
 
 interface Props { params: Promise<{ userId: string }> }
 
 // Stub completed assessment data (will come from DB)
-const STUB_DATA: Record<string, { mgrScores: number[]; selfScores: number[] }> = {
+const STUB_DATA: Record<string, {
+  mgrScores: number[]; selfScores: number[]
+  mgrComment: string; selfComment: string
+  released: boolean
+}> = {
   '2': {
     mgrScores:  [2.17, 1.83, 2.33, 2.0,  2.5,  2.17, 2.67, 2.0,  1.83],
     selfScores: [2.33, 2.0,  2.5,  2.17, 2.67, 2.33, 2.83, 2.17, 2.0 ],
+    mgrComment: 'Анна уверенно ведёт продукт и хорошо работает с бизнес-заказчиками. Для перехода на следующий ранг стоит поработать над системностью анализа корневых причин и глубиной работы с метриками — сейчас решения принимаются точечно, без выстроенной системы мониторинга.',
+    selfComment: 'Хочу прокачать работу с данными — сейчас часто готовлю аналитику по запросу, а не проактивно. Также хочу больше практики в защите решений перед топ-менеджментом.',
+    released: false,
   },
 }
 
-export default async function ManagerGapPage({ params }: Props) {
-  const { userId } = await params
+export default function ManagerGapPage({ params }: Props) {
+  const { userId } = use(params)
 
   const EMPLOYEES: Record<string, { name: string; initials: string; prevGrade: string; prevCls: string }> = {
     '1': { name: 'Иван Петров',    initials: 'ИП', prevGrade: 'Мидл Ранг 1',    prevCls: 'badge-m' },
@@ -20,6 +30,8 @@ export default async function ManagerGapPage({ params }: Props) {
   }
   const emp  = EMPLOYEES[userId] ?? { name: 'Сотрудник', initials: '??', prevGrade: '—', prevCls: 'badge-j' }
   const data = STUB_DATA[userId]
+
+  const [released, setReleased] = useState(data?.released ?? false)
 
   if (!data) {
     return (
@@ -70,6 +82,32 @@ export default async function ManagerGapPage({ params }: Props) {
       </div>
 
       <div className="page-body">
+        {/* Results release gate */}
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap',
+          background: released ? 'var(--green-bg)' : 'var(--amber-bg)',
+          border: `1px solid ${released ? 'var(--green-light)' : 'var(--amber-light)'}`,
+          borderLeft: `3px solid ${released ? 'var(--green)' : 'var(--amber)'}`,
+          borderRadius: 'var(--radius)', padding: '1rem 1.5rem', marginBottom: '1.25rem',
+        }}>
+          <div style={{ flex: 1, minWidth: 240 }}>
+            <div style={{ fontSize: 13, fontWeight: 600, color: released ? 'var(--green)' : 'var(--amber)', marginBottom: 2 }}>
+              {released ? 'Результаты открыты сотруднику' : 'Результаты видны только вам и HR'}
+            </div>
+            <div style={{ fontSize: 12, color: 'var(--muted)', lineHeight: 1.5 }}>
+              {released
+                ? `${emp.name} может видеть эту сводку.`
+                : `${emp.name} не увидит эту сводку, пока вы не проведёте 1:1 и не откроете доступ.`}
+            </div>
+          </div>
+          <button
+            className={released ? 'btn btn-sm' : 'btn btn-primary btn-sm'}
+            onClick={() => setReleased(v => !v)}
+          >
+            {released ? 'Скрыть от сотрудника' : 'Открыть доступ сотруднику'}
+          </button>
+        </div>
+
         {/* Summary header */}
         <div className="card" style={{ marginBottom: '1.25rem' }}>
           <div className="card-body">
@@ -262,6 +300,35 @@ export default async function ManagerGapPage({ params }: Props) {
                 Интерпретация расхождений
               </div>
               <p style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{gapInterpret}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Comments */}
+        <div className="card" style={{ marginTop: '1rem' }}>
+          <div className="card-head">
+            <div className="card-title">Комментарии</div>
+          </div>
+          <div className="card-body" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1.25rem' }}>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--muted)', marginBottom: '.625rem' }}>
+                Итоговый комментарий руководителя
+              </div>
+              {data.mgrComment ? (
+                <p style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{data.mgrComment}</p>
+              ) : (
+                <p style={{ fontSize: 13, color: 'var(--hint)', fontStyle: 'italic' }}>Комментарий не оставлен</p>
+              )}
+            </div>
+            <div>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.1em', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: '.625rem' }}>
+                Приоритеты роста сотрудника
+              </div>
+              {data.selfComment ? (
+                <p style={{ fontSize: 13, color: 'var(--text)', lineHeight: 1.65 }}>{data.selfComment}</p>
+              ) : (
+                <p style={{ fontSize: 13, color: 'var(--hint)', fontStyle: 'italic' }}>Комментарий не оставлен</p>
+              )}
             </div>
           </div>
         </div>

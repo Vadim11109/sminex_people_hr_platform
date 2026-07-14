@@ -57,13 +57,30 @@ export default async function EmployeeDashboard() {
         <div style={{
           background: 'var(--surface)', border: '1px solid var(--border)', borderLeft: '3px solid var(--green)',
           borderRadius: 'var(--radius)', padding: '1.5rem 1.75rem', marginBottom: '1rem',
-          display: 'flex', alignItems: 'center', gap: '1.5rem', opacity: .7,
+          display: 'flex', alignItems: 'center', gap: '1.5rem',
         }}>
           <div style={{ flex: 1 }}>
             <div style={{ fontSize: '14px', fontWeight: 600, marginBottom: '.25rem' }}>Q4 2024 — PO Assessment</div>
             <div style={{ fontSize: '12px', color: 'var(--muted)' }}>Завершён: 15 декабря 2024 · Алексей Воронов</div>
           </div>
-          <span className="status status-done">Завершён</span>
+          <div style={{ flexShrink: 0, textAlign: 'right' }}>
+            <span className="status status-done">Завершён</span>
+            <br/>
+            <a href="/employee/results" className="btn btn-sm" style={{ marginTop: '.75rem', display: 'inline-flex' }}>
+              Посмотреть результаты →
+            </a>
+          </div>
+        </div>
+
+        {/* Completion note */}
+        <div style={{
+          background: 'var(--green-bg)', border: '1px solid var(--green-light)', borderLeft: '3px solid var(--green)',
+          borderRadius: 'var(--radius)', padding: '1rem 1.25rem', marginBottom: '.5rem',
+        }}>
+          <div style={{ fontSize: '13px', color: 'var(--green)', lineHeight: 1.7 }}>
+            <strong>Спасибо, что завершили само-оценку!</strong> В ближайшее время с вами свяжется руководитель для
+            обсуждения результатов. Сводка станет видна после того, как руководитель откроет доступ.
+          </div>
         </div>
 
         {/* Info note */}

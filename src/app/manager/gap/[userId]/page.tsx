@@ -2,6 +2,8 @@
 
 import { use, useState } from 'react'
 import { COMPETENCIES, getGradeInfo, getSummaryText } from '@/lib/assessment-data'
+import { CompetencyBreakdown } from '@/components/ui/CompetencyBreakdown'
+import { EmptyState } from '@/components/ui/EmptyState'
 
 interface Props { params: Promise<{ userId: string }> }
 
@@ -39,8 +41,13 @@ export default function ManagerGapPage({ params }: Props) {
         <div className="topbar">
           <a href="/manager/results" style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '13px' }}>← Результаты</a>
         </div>
-        <div className="page-body" style={{ textAlign: 'center', padding: '4rem 2rem', color: 'var(--muted)' }}>
-          <p>Обе оценки ещё не завершены — gap-анализ будет доступен после их заполнения.</p>
+        <div className="page-body">
+          <EmptyState
+            tone="neutral"
+            icon="📊"
+            title="Gap-анализ пока недоступен"
+            text="Обе оценки ещё не завершены. Как только сотрудник и руководитель заполнят анкеты, здесь появятся сводка, расхождения и разбор по компетенциям."
+          />
         </div>
       </>
     )
@@ -303,6 +310,9 @@ export default function ManagerGapPage({ params }: Props) {
             </div>
           </div>
         </div>
+
+        {/* Competency breakdown */}
+        <CompetencyBreakdown mgrScores={mgrScores} selfScores={selfScores} />
 
         {/* Comments */}
         <div className="card" style={{ marginTop: '1rem' }}>

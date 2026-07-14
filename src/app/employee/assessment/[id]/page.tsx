@@ -113,14 +113,18 @@ export default function EmployeeAssessmentPage() {
               margin: '0 auto 1.75rem', fontSize: 30, color: 'var(--green)',
             }}>✓</div>
             <h2 style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '26px', fontWeight: 600, marginBottom: '.75rem' }}>
-              Спасибо за честность!
+              Спасибо, что завершили само-оценку!
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '2rem' }}>
-              Само-оценка завершена. Ваши ответы переданы руководителю и HR — они используют их
-              для развивающего диалога, а не для пересмотра грейда. Вы молодец, что нашли время
-              осмыслить свою работу.
+              В ближайшее время с вами свяжется ваш непосредственный руководитель для обсуждения
+              результатов. Ответы переданы руководителю и HR — они используются для развивающего
+              диалога, а не для пересмотра грейда. Сводка станет видна после того, как руководитель
+              откроет доступ.
             </p>
-            <a href="/employee" className="btn btn-primary">← К ассесментам</a>
+            <div style={{ display: 'flex', gap: '.75rem', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <a href="/employee" className="btn">← К ассесментам</a>
+              <a href="/employee/results" className="btn btn-primary" style={{ background: 'var(--purple)', borderColor: 'var(--purple)' }}>Посмотреть результаты →</a>
+            </div>
           </div>
         </div>
       </>
@@ -315,6 +319,9 @@ export default function EmployeeAssessmentPage() {
                       <label style={{ display: 'block', fontSize: 11, fontWeight: 600, color: 'var(--hint)', letterSpacing: '.12em', textTransform: 'uppercase', marginBottom: 5 }}>
                         Кейс или конкретный пример из практики <span style={{ textTransform: 'none', fontWeight: 400, letterSpacing: 0 }}>(опционально, необязательно для заполнения)</span>
                       </label>
+                      <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', marginBottom: 6, lineHeight: 1.5 }}>
+                        Не влияет на итоговый балл — учитывается как дополнительное обоснование выбранного уровня.
+                      </div>
                       <textarea
                         value={compExamples[comp.id] ?? ''}
                         onChange={e => setCompExamples(prev => ({ ...prev, [comp.id]: e.target.value }))}
@@ -331,8 +338,11 @@ export default function EmployeeAssessmentPage() {
 
                   {/* Self questions (frequency scale) */}
                   <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.5rem', marginTop: '1.25rem' }}>
-                    <div style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: '1.25rem' }}>
+                    <div style={{ fontSize: '10px', fontWeight: 600, letterSpacing: '.18em', textTransform: 'uppercase', color: 'var(--hint)', marginBottom: '.5rem' }}>
                       Кейс-секция
+                    </div>
+                    <div style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', marginBottom: '1.25rem', lineHeight: 1.5 }}>
+                      Ответы кейс-секции не влияют на итоговый балл — они дают дополнительный контекст выбранному уровню.
                     </div>
 
                     {comp.self_qs.map((q, qi) => {

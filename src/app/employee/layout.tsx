@@ -8,6 +8,7 @@ export default async function EmployeeLayout({ children }: { children: React.Rea
 
   const navItems = [
     { href: '/employee', label: 'Мои ассесменты', badge: 1, exact: true },
+    { href: '/employee/results', label: 'Результаты' },
     { href: '/employee/history', label: 'История' },
   ]
 

@@ -183,8 +183,8 @@ body {
 }
 .btn:hover { background: var(--surface2); }
 .btn-sm { padding: 5px 13px; font-size: 12px; }
-.btn-primary { background: var(--blue); color: #fff; border-color: var(--blue); }
-.btn-primary:hover { opacity: .9; }
+.btn-primary { background: #2b2822; color: #fff; border-color: #2b2822; }
+.btn-primary:hover { background: #413b32; border-color: #413b32; }
 .btn-ghost { border-color: transparent; color: var(--muted); }
 .btn-ghost:hover { background: var(--surface2); color: var(--text); }
 

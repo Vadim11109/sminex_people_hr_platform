@@ -28,7 +28,7 @@ export default function ManagerResultsPage() {
           <div className="stat-card stat-accent-amber">
             <div className="stat-label">Средний gap</div>
             <div className="stat-value">−0.18</div>
-            <div className="stat-sub">само-оценка выше средней</div>
+            <div className="stat-sub">самооценка выше средней</div>
           </div>
         </div>
 
@@ -42,7 +42,7 @@ export default function ManagerResultsPage() {
               <thead>
                 <tr>
                   <th>Сотрудник</th>
-                  <th>Само-оценка (avg)</th>
+                  <th>Самооценка (avg)</th>
                   <th>Оценка руководителя (avg)</th>
                   <th>Gap</th>
                   <th>Прошлый грейд</th>
@@ -61,8 +61,8 @@ export default function ManagerResultsPage() {
                   <td style={{ fontSize: '13px' }}>2.31</td>
                   <td style={{ fontSize: '13px' }}>2.18</td>
                   <td style={{ fontSize: '12px', color: 'var(--muted)' }}>+0.13</td>
-                  <td><span className="badge badge-m">Мидл Ранг 3</span></td>
-                  <td><span className="badge badge-s">Сеньор Ранг 1</span></td>
+                  <td><span className="badge badge-m">Мидл Ранг 1</span></td>
+                  <td><span className="badge badge-s">Сеньор Ранг 3</span></td>
                   <td><a href="/manager/gap/2" className="btn btn-sm">Gap-анализ →</a></td>
                 </tr>
                 <tr style={{ opacity: 0.55 }}>
@@ -75,7 +75,7 @@ export default function ManagerResultsPage() {
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>В процессе</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
-                  <td><span className="badge badge-m">Мидл Ранг 1</span></td>
+                  <td><span className="badge badge-m">Мидл Ранг 3</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
                   <td><button className="btn btn-sm" disabled style={{ opacity: .5 }}>Не готово</button></td>
                 </tr>
@@ -89,7 +89,7 @@ export default function ManagerResultsPage() {
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>Не начато</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
-                  <td><span className="badge badge-j">Джуниор Ранг 3</span></td>
+                  <td><span className="badge badge-j">Джуниор Ранг 1</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
                   <td><button className="btn btn-sm" disabled style={{ opacity: .5 }}>Не готово</button></td>
                 </tr>

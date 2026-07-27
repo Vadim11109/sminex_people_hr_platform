@@ -78,7 +78,7 @@ export default async function EmployeeDashboard() {
           borderRadius: 'var(--radius)', padding: '1rem 1.25rem', marginBottom: '.5rem',
         }}>
           <div style={{ fontSize: '13px', color: 'var(--green)', lineHeight: 1.7 }}>
-            <strong>Спасибо, что завершили само-оценку!</strong> В ближайшее время с вами свяжется руководитель для
+            <strong>Спасибо, что завершили самооценку!</strong> В ближайшее время с вами свяжется руководитель для
             обсуждения результатов. Сводка станет видна после того, как руководитель откроет доступ.
           </div>
         </div>
@@ -89,7 +89,7 @@ export default async function EmployeeDashboard() {
           padding: '1rem 1.25rem', marginTop: '1.5rem',
         }}>
           <div style={{ fontSize: '13px', color: 'var(--amber)', lineHeight: 1.7 }}>
-            <strong>Результаты само-оценки</strong> видны только вашему руководителю и HR — после завершения вы вместе разберёте результаты на 1:1.
+            <strong>Результаты самооценки</strong> видны только вашему руководителю и HR — после завершения вы вместе разберёте результаты на 1:1.
           </div>
         </div>
       </div>

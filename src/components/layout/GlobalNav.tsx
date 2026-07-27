@@ -42,7 +42,7 @@ const SECTIONS = [
     items: [
       { href: '/employee',                          label: 'Мои ассесменты' },
       { href: '/employee/history',                  label: 'История' },
-      { href: '/employee/assessment/current',       label: 'Само-оценка (текущая)' },
+      { href: '/employee/assessment/current',       label: 'Самооценка (текущая)' },
     ],
   },
 ]

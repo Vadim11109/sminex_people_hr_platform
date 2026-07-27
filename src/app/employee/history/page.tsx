@@ -54,10 +54,10 @@ export default function EmployeeHistoryPage() {
 
         {/* Cycle list */}
         {[
-          { cycle: 'Q1 2025', date: 'Март 2025', grade: 'Мидл Ранг 3', gradeCls: 'badge-m', avgSelf: 2.31, avgMgr: 2.18, isCurrent: true },
+          { cycle: 'Q1 2025', date: 'Март 2025', grade: 'Мидл Ранг 1', gradeCls: 'badge-m', avgSelf: 2.31, avgMgr: 2.18, isCurrent: true },
           { cycle: 'Q4 2024', date: 'Декабрь 2024', grade: 'Мидл Ранг 2', gradeCls: 'badge-m', avgSelf: 2.12, avgMgr: 2.01, isCurrent: false },
           { cycle: 'Q3 2024', date: 'Сентябрь 2024', grade: 'Мидл Ранг 2', gradeCls: 'badge-m', avgSelf: 1.95, avgMgr: 1.82, isCurrent: false },
-          { cycle: 'Q2 2024', date: 'Июнь 2024', grade: 'Мидл Ранг 1', gradeCls: 'badge-m', avgSelf: 1.78, avgMgr: 1.65, isCurrent: false },
+          { cycle: 'Q2 2024', date: 'Июнь 2024', grade: 'Мидл Ранг 3', gradeCls: 'badge-m', avgSelf: 1.78, avgMgr: 1.65, isCurrent: false },
         ].map(({ cycle, date, grade, gradeCls, avgSelf, avgMgr, isCurrent }) => (
           <div key={cycle} className="card" style={{
             marginBottom: '.75rem',

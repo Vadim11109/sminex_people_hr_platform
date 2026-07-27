@@ -17,9 +17,9 @@ function gradeCss(grade: string) {
 
 // Stub employee data
 const EMPLOYEES: Record<string, { name: string; initials: string; prevGrade: string; prevCls: string }> = {
-  '1': { name: 'Иван Петров',     initials: 'ИП', prevGrade: 'Мидл Ранг 1',    prevCls: 'badge-m' },
-  '2': { name: 'Анна Сидорова',   initials: 'АС', prevGrade: 'Мидл Ранг 3',    prevCls: 'badge-m' },
-  '3': { name: 'Дмитрий Козлов',  initials: 'ДК', prevGrade: 'Джуниор Ранг 3', prevCls: 'badge-j' },
+  '1': { name: 'Иван Петров',     initials: 'ИП', prevGrade: 'Мидл Ранг 3',    prevCls: 'badge-m' },
+  '2': { name: 'Анна Сидорова',   initials: 'АС', prevGrade: 'Мидл Ранг 1',    prevCls: 'badge-m' },
+  '3': { name: 'Дмитрий Козлов',  initials: 'ДК', prevGrade: 'Джуниор Ранг 1', prevCls: 'badge-j' },
 }
 
 export default function ManagerAssessPage({ params }: { params: Promise<{ userId: string }> }) {

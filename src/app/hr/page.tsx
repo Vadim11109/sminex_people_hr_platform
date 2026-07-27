@@ -122,10 +122,10 @@ export default function HrDashboard() {
               </thead>
               <tbody>
                 {[
-                  { name: 'Анна Сидорова',   initials: 'АС', action: 'Завершила само-оценку',  team: 'IT-продукты',       time: '2 ч. назад' },
+                  { name: 'Анна Сидорова',   initials: 'АС', action: 'Завершила самооценку',  team: 'IT-продукты',       time: '2 ч. назад' },
                   { name: 'Алексей Воронов', initials: 'АВ', action: 'Оценил 2 сотрудников',   team: 'IT-продукты',       time: '5 ч. назад' },
-                  { name: 'Дмитрий Козлов',  initials: 'ДК', action: 'Начал само-оценку',       team: 'IT-продукты',       time: 'вчера' },
-                  { name: 'Марина Волкова',  initials: 'МВ', action: 'Завершила само-оценку',  team: 'Строительство',     time: 'вчера' },
+                  { name: 'Дмитрий Козлов',  initials: 'ДК', action: 'Начал самооценку',       team: 'IT-продукты',       time: 'вчера' },
+                  { name: 'Марина Волкова',  initials: 'МВ', action: 'Завершила самооценку',  team: 'Строительство',     time: 'вчера' },
                 ].map(({ name, initials, action, team, time }) => (
                   <tr key={name}>
                     <td>

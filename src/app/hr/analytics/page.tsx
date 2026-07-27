@@ -29,7 +29,7 @@ export default function HrAnalyticsPage() {
           <div className="stat-card stat-accent-amber">
             <div className="stat-label">Средний gap (само vs руководитель)</div>
             <div className="stat-value">−0.21</div>
-            <div className="stat-sub">само-оценка выше</div>
+            <div className="stat-sub">самооценка выше</div>
           </div>
         </div>
 
@@ -74,7 +74,7 @@ export default function HrAnalyticsPage() {
             <div className="card-head">
               <div>
                 <div className="card-title">Gap-анализ по командам</div>
-                <div className="card-sub">Само-оценка vs оценка руководителя</div>
+                <div className="card-sub">Самооценка vs оценка руководителя</div>
               </div>
             </div>
             <div className="card-body-flush">
@@ -82,7 +82,7 @@ export default function HrAnalyticsPage() {
                 <thead>
                   <tr>
                     <th>Команда</th>
-                    <th>Само-оценка</th>
+                    <th>Самооценка</th>
                     <th>Оценка руководителя</th>
                     <th>Gap</th>
                   </tr>
@@ -140,10 +140,10 @@ export default function HrAnalyticsPage() {
               </thead>
               <tbody>
                 {[
-                  { name: 'Анна Сидорова', team: 'IT Products', prev: 'Мидл Ранг 2', prevCls: 'badge-m', curr: 'Мидл Ранг 3', currCls: 'badge-m', change: '↑ Ранг +1' },
-                  { name: 'Марина Волкова', team: 'Analytics', prev: 'Джуниор Ранг 3', prevCls: 'badge-j', curr: 'Мидл Ранг 1', currCls: 'badge-m', change: '↑ Повышение' },
+                  { name: 'Анна Сидорова', team: 'IT Products', prev: 'Мидл Ранг 2', prevCls: 'badge-m', curr: 'Мидл Ранг 1', currCls: 'badge-m', change: '↑ Ранг +1' },
+                  { name: 'Марина Волкова', team: 'Analytics', prev: 'Джуниор Ранг 1', prevCls: 'badge-j', curr: 'Мидл Ранг 3', currCls: 'badge-m', change: '↑ Повышение' },
                   { name: 'Алексей Морозов', team: 'IT Products', prev: 'Сеньор Ранг 2', prevCls: 'badge-s', curr: 'Сеньор Ранг 2', currCls: 'badge-s', change: '— Без изменений' },
-                  { name: 'Роман Кузнецов', team: 'Finance', prev: 'Мидл Ранг 1', prevCls: 'badge-m', curr: 'Джуниор Ранг 3', currCls: 'badge-j', change: '↓ Снижение' },
+                  { name: 'Роман Кузнецов', team: 'Finance', prev: 'Мидл Ранг 3', prevCls: 'badge-m', curr: 'Джуниор Ранг 1', currCls: 'badge-j', change: '↓ Снижение' },
                 ].map(({ name, team, prev, prevCls, curr, currCls, change }) => (
                   <tr key={name}>
                     <td style={{ fontWeight: 500, fontSize: '13px' }}>{name}</td>

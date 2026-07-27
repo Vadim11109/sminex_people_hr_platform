@@ -34,9 +34,9 @@ export default function EmployeeResultsPage() {
   const selfCss = gradeCss(selfGi.grade)
 
   let gapInterpret: string
-  if (absDiff < 0.3)    gapInterpret = `Само-оценка и оценка руководителя совпадают (расхождение ${gap.toFixed(2)}). Высокий уровень рефлексии и самоосознанности.`
-  else if (gap < 0)     gapInterpret = `Руководитель оценивает выше само-оценки (+${(-gap).toFixed(2)}). Возможно, вы недооцениваете свои сильные стороны — стоит обсудить это на встрече 1:1.`
-  else                  gapInterpret = `Само-оценка выше оценки руководителя на ${gap.toFixed(2)}. Хорошая точка входа для развивающего диалога о том, как выглядят ожидания на следующем уровне.`
+  if (absDiff < 0.3)    gapInterpret = `Самооценка и оценка руководителя совпадают (расхождение ${gap.toFixed(2)}). Высокий уровень рефлексии и самоосознанности.`
+  else if (gap < 0)     gapInterpret = `Руководитель оценивает выше самооценки (+${(-gap).toFixed(2)}). Возможно, вы недооцениваете свои сильные стороны — стоит обсудить это на встрече 1:1.`
+  else                  gapInterpret = `Самооценка выше оценки руководителя на ${gap.toFixed(2)}. Хорошая точка входа для развивающего диалога о том, как выглядят ожидания на следующем уровне.`
 
   return (
     <>
@@ -62,7 +62,7 @@ export default function EmployeeResultsPage() {
             tone="amber"
             icon="🔒"
             title="Результаты пока закрыты"
-            text="Само-оценка завершена. Доступ к сводке открывает руководитель или HR — обычно после разговора 1:1. Как только откроют, здесь появятся ваша оценка, оценка руководителя и расхождение."
+            text="Самооценка завершена. Доступ к сводке открывает руководитель или HR — обычно после разговора 1:1. Как только откроют, здесь появятся ваша оценка, оценка руководителя и расхождение."
             chip={<>⏳ Ожидает открытия доступа</>}
           />
         ) : (
@@ -75,12 +75,12 @@ export default function EmployeeResultsPage() {
             {/* Score summary */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginBottom: '1.25rem' }}>
               {[
-                { label: 'Само-оценка', value: selfAvg.toFixed(2), grade: selfGi.label, css: selfCss },
+                { label: 'Самооценка', value: selfAvg.toFixed(2), grade: selfGi.label, css: selfCss },
                 { label: 'Оценка руководителя', value: mgrAvg.toFixed(2), grade: mgrGi.label, css: mgrCss },
                 {
                   label: 'Расхождение (Gap)',
                   value: (gap > 0 ? '+' : '') + gap.toFixed(2),
-                  grade: absDiff < 0.3 ? 'Совпадение' : gap > 0 ? 'Само-оценка выше' : 'Руководитель выше',
+                  grade: absDiff < 0.3 ? 'Совпадение' : gap > 0 ? 'Самооценка выше' : 'Руководитель выше',
                   css: absDiff < 0.3
                     ? { bg: 'var(--green-bg)', border: 'var(--green-light)', color: 'var(--green)' }
                     : { bg: 'var(--amber-bg)', border: 'var(--amber-light)', color: 'var(--amber)' },

@@ -4,7 +4,7 @@ import type { UserRole } from '@prisma/client'
 
 const roleConfig: Record<UserRole, { label: string; tag: string; desc: string; href: string; tagCls: string; cardCls: string }> = {
   EMPLOYEE: {
-    label: 'Само-оценка',
+    label: 'Самооценка',
     tag: 'Сотрудник',
     desc: 'Пройти ассесмент, посмотреть историю своих оценок',
     href: '/employee',

@@ -26,9 +26,9 @@ export default function ManagerGapPage({ params }: Props) {
   const { userId } = use(params)
 
   const EMPLOYEES: Record<string, { name: string; initials: string; prevGrade: string; prevCls: string }> = {
-    '1': { name: 'Иван Петров',    initials: 'ИП', prevGrade: 'Мидл Ранг 1',    prevCls: 'badge-m' },
-    '2': { name: 'Анна Сидорова',  initials: 'АС', prevGrade: 'Мидл Ранг 3',    prevCls: 'badge-m' },
-    '3': { name: 'Дмитрий Козлов', initials: 'ДК', prevGrade: 'Джуниор Ранг 3', prevCls: 'badge-j' },
+    '1': { name: 'Иван Петров',    initials: 'ИП', prevGrade: 'Мидл Ранг 3',    prevCls: 'badge-m' },
+    '2': { name: 'Анна Сидорова',  initials: 'АС', prevGrade: 'Мидл Ранг 1',    prevCls: 'badge-m' },
+    '3': { name: 'Дмитрий Козлов', initials: 'ДК', prevGrade: 'Джуниор Ранг 1', prevCls: 'badge-j' },
   }
   const emp  = EMPLOYEES[userId] ?? { name: 'Сотрудник', initials: '??', prevGrade: '—', prevCls: 'badge-j' }
   const data = STUB_DATA[userId]
@@ -62,9 +62,9 @@ export default function ManagerGapPage({ params }: Props) {
 
   const absDiff = Math.abs(gap)
   let gapInterpret: string
-  if (absDiff < 0.3)    gapInterpret = `Само-оценка и оценка руководителя совпадают (расхождение ${gap.toFixed(2)}). Высокий уровень рефлексии и самоосознанности.`
-  else if (gap < 0)     gapInterpret = `Руководитель оценивает выше само-оценки (+${(-gap).toFixed(2)}). Сотрудник может недооценивать свои сильные стороны. Стоит обсудить, в чём проявляется неуверенность.`
-  else                  gapInterpret = `Само-оценка выше оценки руководителя на ${gap.toFixed(2)}. Возможна переоценка компетенций — хорошая точка входа для развивающего диалога.`
+  if (absDiff < 0.3)    gapInterpret = `Самооценка и оценка руководителя совпадают (расхождение ${gap.toFixed(2)}). Высокий уровень рефлексии и самоосознанности.`
+  else if (gap < 0)     gapInterpret = `Руководитель оценивает выше самооценки (+${(-gap).toFixed(2)}). Сотрудник может недооценивать свои сильные стороны. Стоит обсудить, в чём проявляется неуверенность.`
+  else                  gapInterpret = `Самооценка выше оценки руководителя на ${gap.toFixed(2)}. Возможна переоценка компетенций — хорошая точка входа для развивающего диалога.`
 
   function gradeCss(grade: string) {
     if (grade === 'S') return { bg: 'var(--amber-bg)', border: 'var(--amber-light)', color: 'var(--amber)' }
@@ -136,12 +136,12 @@ export default function ManagerGapPage({ params }: Props) {
             {/* Score summary */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '1rem', marginTop: '1.25rem' }}>
               {[
-                { label: 'Само-оценка', value: selfAvg.toFixed(2), grade: selfGi.label, css: selfCss },
+                { label: 'Самооценка', value: selfAvg.toFixed(2), grade: selfGi.label, css: selfCss },
                 { label: 'Оценка руководителя', value: mgrAvg.toFixed(2), grade: mgrGi.label, css: mgrCss },
                 {
                   label: 'Gap (само − руководитель)',
                   value: (gap > 0 ? '+' : '') + gap.toFixed(2),
-                  grade: absDiff < 0.3 ? 'Совпадение' : gap > 0 ? 'Завышена само-оценка' : 'Занижена само-оценка',
+                  grade: absDiff < 0.3 ? 'Совпадение' : gap > 0 ? 'Завышена самооценка' : 'Занижена самооценка',
                   css: absDiff < 0.3
                     ? { bg: 'var(--green-bg)', border: 'var(--green-light)', color: 'var(--green)' }
                     : { bg: 'var(--amber-bg)', border: 'var(--amber-light)', color: 'var(--amber)' },
@@ -207,7 +207,7 @@ export default function ManagerGapPage({ params }: Props) {
           {/* Self result */}
           <div style={{ background: 'var(--purple-bg, #F5EEFA)', border: '1px solid var(--purple-light, #CDB8E0)', borderRadius: 'var(--radius)', padding: '1.5rem 2rem' }}>
             <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.12em', textTransform: 'uppercase', color: 'var(--purple)', marginBottom: '.875rem' }}>
-              Само-оценка (9/9 компетенций)
+              Самооценка (9/9 компетенций)
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               <div style={{
@@ -248,15 +248,15 @@ export default function ManagerGapPage({ params }: Props) {
           <div className="card-head">
             <div>
               <div className="card-title">Анализ расхождений</div>
-              <div className="card-sub">Само-оценка минус оценка руководителя по каждой компетенции</div>
+              <div className="card-sub">Самооценка минус оценка руководителя по каждой компетенции</div>
             </div>
           </div>
           <div className="card-body">
             {/* Legend */}
             <div style={{ display: 'flex', gap: '1.25rem', marginBottom: '1rem', flexWrap: 'wrap' }}>
               {[
-                { color: 'var(--purple)', label: 'Завышена само-оценка' },
-                { color: 'var(--red, #991B1B)', label: 'Занижена само-оценка' },
+                { color: 'var(--purple)', label: 'Завышена самооценка' },
+                { color: 'var(--red, #991B1B)', label: 'Занижена самооценка' },
                 { color: 'var(--green)', label: 'Совпадение' },
               ].map(({ color, label }) => (
                 <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: 'var(--muted)' }}>

@@ -113,7 +113,7 @@ export default function EmployeeAssessmentPage() {
               margin: '0 auto 1.75rem', fontSize: 30, color: 'var(--green)',
             }}>✓</div>
             <h2 style={{ fontFamily: 'var(--font-playfair), Georgia, serif', fontSize: '26px', fontWeight: 600, marginBottom: '.75rem' }}>
-              Спасибо, что завершили само-оценку!
+              Спасибо, что завершили самооценку!
             </h2>
             <p style={{ fontSize: '14px', color: 'var(--muted)', lineHeight: 1.7, marginBottom: '2rem' }}>
               В ближайшее время с вами свяжется ваш непосредственный руководитель для обсуждения
@@ -139,7 +139,7 @@ export default function EmployeeAssessmentPage() {
           <a href="/employee" style={{ color: 'var(--muted)', textDecoration: 'none', fontSize: '13px' }}>← Назад</a>
           <span style={{ color: 'var(--border)' }}>/</span>
           <h1 style={{ fontSize: '15px', fontWeight: 600 }}>Q1 2025 — PO Assessment</h1>
-          <span className="role-pill role-pill-employee">Само-оценка</span>
+          <span className="role-pill role-pill-employee">Самооценка</span>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '.75rem' }}>
           <div className="prog-track" style={{ width: '140px' }}>
@@ -170,11 +170,11 @@ export default function EmployeeAssessmentPage() {
           padding: '1.25rem 1.75rem', marginBottom: '1.75rem',
         }}>
           <p style={{ fontSize: '13px', color: '#3B0764', lineHeight: 1.65 }}>
-            <strong>Как работает само-оценка.</strong> Для каждой компетенции оцените себя по каждому аспекту —
+            <strong>Как работает самооценка.</strong> Для каждой компетенции оцените себя по каждому аспекту —
             кликните на описание уровня, которое лучше всего отражает вашу текущую практику.
             Если навык не проявляется — нажмите «✕ Не показываю». Добавьте конкретный кейс из практики.
             <br />
-            <strong>Будьте честны:</strong> само-оценка сравнивается с оценкой руководителя — расхождения
+            <strong>Будьте честны:</strong> самооценка сравнивается с оценкой руководителя — расхождения
             в обе стороны становятся темой для разговора, а не основанием для пересмотра грейда.
           </p>
         </div>
@@ -437,7 +437,7 @@ export default function EmployeeAssessmentPage() {
             disabled={!allDone}
             style={{ opacity: allDone ? 1 : .45, background: 'var(--purple)', borderColor: 'var(--purple)' }}
           >
-            Завершить само-оценку ({doneCount} / 9)
+            Завершить самооценку ({doneCount} / 9)
           </button>
           <a href="/employee" className="btn">Сохранить и выйти</a>
         </div>

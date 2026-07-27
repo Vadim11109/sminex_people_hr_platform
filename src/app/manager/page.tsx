@@ -44,7 +44,7 @@ export default function ManagerDashboard() {
               <thead>
                 <tr>
                   <th>Сотрудник</th>
-                  <th>Само-оценка</th>
+                  <th>Самооценка</th>
                   <th>Оценка руководителя</th>
                   <th>Грейд (прошлый)</th>
                   <th>Gap-анализ</th>
@@ -64,7 +64,7 @@ export default function ManagerDashboard() {
                   </td>
                   <td><span className="status status-done">Готово</span></td>
                   <td><span className="status status-pending">Не начата</span></td>
-                  <td><span className="badge badge-m">Мидл Ранг 3</span></td>
+                  <td><span className="badge badge-m">Мидл Ранг 1</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>— ждём оценки</span></td>
                   <td><a href="/manager/assess/2" className="btn btn-primary btn-sm">Оценить →</a></td>
                 </tr>
@@ -80,9 +80,9 @@ export default function ManagerDashboard() {
                   </td>
                   <td><span className="status status-progress">В процессе (3/9)</span></td>
                   <td><span className="status status-pending">Не начата</span></td>
-                  <td><span className="badge badge-m">Мидл Ранг 1</span></td>
+                  <td><span className="badge badge-m">Мидл Ранг 3</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
-                  <td><button className="btn btn-sm" disabled style={{ opacity: .5 }}>Ожидаем само-оценку</button></td>
+                  <td><button className="btn btn-sm" disabled style={{ opacity: .5 }}>Ожидаем самооценку</button></td>
                 </tr>
                 <tr style={{ opacity: 0.6 }}>
                   <td>
@@ -96,9 +96,9 @@ export default function ManagerDashboard() {
                   </td>
                   <td><span className="status status-pending">Не начата</span></td>
                   <td><span className="status status-pending">Не начата</span></td>
-                  <td><span className="badge badge-j">Джуниор Ранг 3</span></td>
+                  <td><span className="badge badge-j">Джуниор Ранг 1</span></td>
                   <td><span style={{ fontSize: '12px', color: 'var(--hint)' }}>—</span></td>
-                  <td><button className="btn btn-sm" disabled style={{ opacity: .5 }}>Ожидаем само-оценку</button></td>
+                  <td><button className="btn btn-sm" disabled style={{ opacity: .5 }}>Ожидаем самооценку</button></td>
                 </tr>
               </tbody>
             </table>

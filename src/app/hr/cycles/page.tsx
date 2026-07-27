@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 
 interface Cycle {
   id: string
@@ -28,6 +28,9 @@ interface Group {
 
 const STATUS_LABEL = { DRAFT: 'Черновик', ACTIVE: 'Активный', CLOSED: 'Завершён' }
 const STATUS_CLS   = { DRAFT: 'status-pending', ACTIVE: 'status-progress', CLOSED: 'status-done' }
+
+const raterEyebrowSt: React.CSSProperties = { fontSize: 10, fontWeight: 700, color: 'var(--hint)', letterSpacing: '.1em', textTransform: 'uppercase', marginBottom: 5 }
+const raterInputSt: React.CSSProperties = { width: '100%', padding: '5px 10px', border: '1px solid var(--border)', borderRadius: 3, fontSize: 12, color: 'var(--text)', background: 'var(--surface2)', outline: 'none', fontFamily: 'inherit', boxSizing: 'border-box' }
 
 function fmtDate(s: string | null) {
   if (!s) return '—'
@@ -117,6 +120,16 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
   const [error, setError]       = useState(false)
   const [saving, setSaving]     = useState(false)
   const [launchErr, setLaunchErr] = useState('')
+  // Оценщики 360° (заказчик/РЦЭ) по каждому участнику. UI-демо: держим локально,
+  // до 2 на роль. Схема БД прототипа их пока не хранит — переносим только редактор.
+  const [raters, setRaters] = useState<Record<string, { customers: [string, string]; rces: [string, string] }>>({})
+  const setRater = (empId: string, kind: 'customers' | 'rces', idx: 0 | 1, value: string) =>
+    setRaters(prev => {
+      const cur = prev[empId] ?? { customers: ['', ''] as [string, string], rces: ['', ''] as [string, string] }
+      const arr = [...cur[kind]] as [string, string]
+      arr[idx] = value
+      return { ...prev, [empId]: { ...cur, [kind]: arr } }
+    })
 
   useEffect(() => {
     fetch(`/api/cycles/${cycle.id}/launch`)
@@ -156,7 +169,15 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
     setSaving(true); setLaunchErr('')
     const res = await fetch(`/api/cycles/${cycle.id}/launch`, {
       method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ employeeIds: [...selected] }),
+      body: JSON.stringify({
+        employeeIds: [...selected],
+        // 360°-оценщики (демо): бэкенд прототипа их пока не сохраняет
+        raters: [...selected].map(id => ({
+          employeeId: id,
+          customers: (raters[id]?.customers ?? []).map(s => s.trim()).filter(Boolean),
+          rces: (raters[id]?.rces ?? []).map(s => s.trim()).filter(Boolean),
+        })).filter(r => r.customers.length || r.rces.length),
+      }),
     })
     if (res.ok) { onLaunched(); onClose() }
     else setLaunchErr('Ошибка запуска. Проверьте подключение к БД.')
@@ -178,6 +199,9 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
         <div style={{ padding: '1.5rem 1.75rem', borderBottom: '1px solid var(--border)' }}>
           <div style={{ fontSize: 15, fontWeight: 600, marginBottom: '.25rem' }}>Выбор участников</div>
           <div style={{ fontSize: 12, color: 'var(--muted)' }}>{cycle.name}</div>
+          <div style={{ fontSize: 11, color: 'var(--hint)', marginTop: '.375rem' }}>
+            У выбранного участника можно указать заказчиков и РЦЭ (360°) — по желанию, до 2 на роль.
+          </div>
         </div>
 
         {/* Body */}
@@ -237,8 +261,8 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
 
                 {/* Employees */}
                 {group.employees.map(emp => (
+                  <Fragment key={emp.id}>
                   <div
-                    key={emp.id}
                     onClick={() => toggleEmp(emp.id)}
                     style={{
                       display: 'flex', alignItems: 'center', gap: '.75rem',
@@ -264,6 +288,33 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
                     </div>
                     {emp.team && <span style={{ fontSize: 10, color: 'var(--hint)' }}>{emp.team}</span>}
                   </div>
+
+                  {/* Оценщики 360° — заказчики / РЦЭ (до 2). Появляются у выбранного участника. */}
+                  {selected.has(emp.id) && (
+                    <div
+                      onClick={e => e.stopPropagation()}
+                      style={{ padding: '.25rem .75rem .75rem 2.25rem', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}
+                    >
+                      {(['customers', 'rces'] as const).map(kind => (
+                        <div key={kind}>
+                          <div style={raterEyebrowSt}>
+                            {kind === 'customers' ? 'Заказчики' : 'РЦЭ'}{' '}
+                            <span style={{ fontWeight: 400, textTransform: 'none', letterSpacing: 0, color: 'var(--hint)' }}>(до 2, опц.)</span>
+                          </div>
+                          {[0, 1].map(i => (
+                            <input
+                              key={i}
+                              value={raters[emp.id]?.[kind]?.[i] ?? ''}
+                              onChange={e => setRater(emp.id, kind, i as 0 | 1, e.target.value)}
+                              placeholder={kind === 'customers' ? `email заказчика ${i + 1}` : `email РЦЭ ${i + 1}`}
+                              style={{ ...raterInputSt, marginBottom: i === 0 ? 6 : 0 }}
+                            />
+                          ))}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                  </Fragment>
                 ))}
               </div>
             )

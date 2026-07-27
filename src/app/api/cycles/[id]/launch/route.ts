@@ -54,7 +54,10 @@ export async function POST(
 ) {
   try {
     const { id: cycleId } = await params
-    const { employeeIds } = await req.json() as { employeeIds: string[] }
+    const { employeeIds, raters } = await req.json() as {
+      employeeIds: string[]
+      raters?: { employeeId: string; customers?: string[]; rces?: string[] }[]
+    }
 
     if (!employeeIds || employeeIds.length === 0) {
       return NextResponse.json({ error: 'No participants selected' }, { status: 400 })
@@ -86,6 +89,28 @@ export async function POST(
         })
       ),
     ])
+
+    // 360°-оценщики (заказчик / РЦЭ). Аддитивно и НЕ блокирует запуск: если что-то
+    // пойдёт не так — цикл всё равно запущен по сотрудникам.
+    if (raters?.length) {
+      try {
+        const asg = await prisma.assignment.findMany({
+          where: { cycleId, employeeId: { in: employeeIds } },
+          select: { id: true, employeeId: true },
+        })
+        const asgByEmp = new Map(asg.map(a => [a.employeeId, a.id]))
+        const rows: { assignmentId: string; role: 'CUSTOMER' | 'RCE'; email: string }[] = []
+        for (const r of raters) {
+          const aid = asgByEmp.get(r.employeeId)
+          if (!aid) continue
+          for (const e of r.customers ?? []) { const em = e.trim().toLowerCase(); if (em) rows.push({ assignmentId: aid, role: 'CUSTOMER', email: em }) }
+          for (const e of r.rces ?? [])      { const em = e.trim().toLowerCase(); if (em) rows.push({ assignmentId: aid, role: 'RCE', email: em }) }
+        }
+        if (rows.length) await prisma.externalReview.createMany({ data: rows, skipDuplicates: true })
+      } catch (err) {
+        console.error('externalReview create failed (non-blocking)', err)
+      }
+    }
 
     return NextResponse.json({ ok: true, created: employees.length })
   } catch (e) {

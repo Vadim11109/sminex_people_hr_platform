@@ -41,6 +41,7 @@ const SECTIONS = [
     border: 'var(--purple-light)',
     items: [
       { href: '/employee',                          label: 'Мои ассесменты' },
+      { href: '/employee/reviews',                  label: 'Мои опросы' },
       { href: '/employee/history',                  label: 'История' },
       { href: '/employee/assessment/current',       label: 'Самооценка (текущая)' },
     ],

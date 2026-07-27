@@ -26,6 +26,11 @@ enum AssessmentStatus {
   COMPLETED
 }
 
+enum RaterRole {
+  CUSTOMER
+  RCE
+}
+
 // ─── MODELS ──────────────────────────────────────────────────
 
 model User {
@@ -141,6 +146,7 @@ model Assignment {
 
   selfAssessment SelfAssessment?
   mgrAssessment  ManagerAssessment?
+  externalReviews ExternalReview[]
 
   createdAt DateTime @default(now())
 
@@ -165,6 +171,27 @@ model SelfAssessment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Внешняя оценка 360° (заказчик / РЦЭ). Одна строка на оценщика-назначение.
+model ExternalReview {
+  id           String           @id @default(cuid())
+  assignmentId String
+  assignment   Assignment       @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  role         RaterRole
+  email        String
+
+  answers      Json             @default("{}")
+  generalNote  String?
+
+  status       AssessmentStatus @default(NOT_STARTED)
+  completedAt  DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([assignmentId, role, email])
+  @@index([email])
 }
 
 model ManagerAssessment {

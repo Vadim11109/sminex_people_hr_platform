@@ -130,6 +130,14 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
       arr[idx] = value
       return { ...prev, [empId]: { ...cur, [kind]: arr } }
     })
+  // Текущий пользователь — для «Назначить меня оценщиком» (solo-тест 360°).
+  const [myEmail, setMyEmail] = useState('')
+  useEffect(() => { fetch('/api/me').then(r => r.json()).then(d => setMyEmail(d?.email ?? '')).catch(() => {}) }, [])
+  function assignMeAsRater() {
+    const firstSelected = [...selected][0]
+    if (!firstSelected || !myEmail) return
+    setRaters(prev => ({ ...prev, [firstSelected]: { customers: [myEmail, ''], rces: [myEmail, ''] } }))
+  }
 
   useEffect(() => {
     fetch(`/api/cycles/${cycle.id}/launch`)
@@ -218,6 +226,17 @@ function LaunchModal({ cycle, onClose, onLaunched }: {
             <div style={{ textAlign: 'center', padding: '2rem', color: 'var(--hint)', fontSize: 13 }}>
               Нет сотрудников с назначенными руководителями. Сначала назначьте руководителей в разделе Пользователи.
             </div>
+          )}
+
+          {!loading && !error && totalEmployees > 0 && myEmail && (
+            <button
+              className="btn btn-sm"
+              style={{ marginBottom: '1rem' }}
+              onClick={assignMeAsRater}
+              title="Подставит ваш email как заказчика и РЦЭ первому выбранному участнику — для solo-теста"
+            >
+              Назначить меня оценщиком ({myEmail})
+            </button>
           )}
 
           {!loading && !error && groups.map(group => {
